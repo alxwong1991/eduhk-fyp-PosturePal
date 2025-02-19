@@ -1,9 +1,7 @@
 import { useState } from "react";
 import Swal from "sweetalert2";
 import styled from "styled-components";
-import { startWebSocket, closeWebSocket } from "./api/websocket";
 
-// ✅ Styled Components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -20,14 +18,6 @@ const Title = styled.h1`
   margin-top: 40px;
   font-size: 36px;
   color: #fff;
-`;
-
-const NameInput = styled.input`
-  padding: 8px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  margin-right: 10px;
 `;
 
 const Button = styled.button`
@@ -52,34 +42,65 @@ const WebcamFeed = styled.img`
 `;
 
 export default function App() {
-  const [name, setName] = useState("");
   const [exerciseStarted, setExerciseStarted] = useState(false);
   const [counter, setCounter] = useState(0);
-  const [image, setImage] = useState(""); // ✅ State for Webcam Frame
+  const [image, setImage] = useState("");
 
-  function saveName() {
-    if (!name.trim()) {
-      Swal.fire({ icon: "error", title: "Oops...", text: "Please enter your name." });
-      return;
+  async function startExercise() {
+    let countdown = 5;
+
+    // ✅ Clear the previous frame before starting
+    setImage(""); 
+
+    // ✅ Show Swal Countdown (Loop with await)
+    for (let i = countdown; i > 0; i--) {
+      await Swal.fire({
+        title: `Starting in ${i}...`,
+        text: "Get ready!",
+        timer: 1000,
+        showConfirmButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      });
     }
 
-    Swal.fire({ icon: "success", title: "Success!", text: `Hi, ${name}!` });
-    setExerciseStarted(false);
+    // ✅ After countdown, start the exercise
+    beginExercise();
   }
 
-  function startExercise() {
+  async function beginExercise() {
     setExerciseStarted(true);
-    startWebSocket(setCounter, setImage); // ✅ Start WebSocket
+
+    // ✅ Start MJPEG Streaming
+    await fetch("http://localhost:8000/start_streaming");
+
+    // ✅ Open WebSocket for Bicep Curls Tracking
+    const ws = new WebSocket("ws://localhost:8000/ws/start_bicep_curls");
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+
+      if (data.event === "update_frame") {
+        setImage(`data:image/jpeg;base64,${data.image}`);
+        setCounter(data.counter);
+      }
+
+      if (data.event === "exercise_finished") {
+        Swal.fire("Exercise Completed!", `Total reps: ${data.counter}`, "success");
+        setExerciseStarted(false);
+        fetch("http://localhost:8000/stop_streaming"); // ✅ Stop Streaming
+      }
+    };
+
+    ws.onclose = () => {
+      setExerciseStarted(false);
+      fetch("http://localhost:8000/stop_streaming"); // ✅ Stop Streaming
+    };
   }
 
   return (
     <Container>
       <Title>Virtual PE Coach</Title>
-
-      <div>
-        <NameInput type="text" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
-        <Button onClick={saveName}>Save Name</Button>
-      </div>
 
       {!exerciseStarted && <Button onClick={startExercise}>Start Bicep Curls</Button>}
 
