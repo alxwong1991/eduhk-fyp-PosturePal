@@ -47,13 +47,12 @@ export default function App() {
   const [image, setImage] = useState("");
 
   async function startExercise() {
-    let countdown = 5;
+    // ✅ Reset counter and clear previous frame before starting
+    setCounter(0);
+    setImage("");
 
-    // ✅ Clear the previous frame before starting
-    setImage(""); 
-
-    // ✅ Show Swal Countdown (Loop with await)
-    for (let i = countdown; i > 0; i--) {
+    // ✅ Show Swal Countdown
+    for (let i = 5; i > 0; i--) {
       await Swal.fire({
         title: `Starting in ${i}...`,
         text: "Get ready!",
