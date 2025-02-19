@@ -5,7 +5,7 @@ class Camera:
         self.cap = None
 
     def start_capture(self):
-        self.cap = cv2.VideoCapture(1)
+        self.cap = cv2.VideoCapture(3)
 
     def read_frame(self):
         ret, frame = self.cap.read()

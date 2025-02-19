@@ -1,35 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import Swal from "sweetalert2";
+import styled from "styled-components";
+import { startWebSocket, closeWebSocket } from "./api/websocket";
 
-function App() {
-  const [count, setCount] = useState(0)
+// ✅ Styled Components
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background-color: #222;
+  color: #fff;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  margin-top: 40px;
+  font-size: 36px;
+  color: #fff;
+`;
+
+const NameInput = styled.input`
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+`;
+
+const Button = styled.button`
+  padding: 8px 20px;
+  background-color: #337ab7;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  &:hover {
+    background-color: #286090;
+  }
+`;
+
+const WebcamFeed = styled.img`
+  margin-top: 20px;
+  width: 640px;
+  height: 480px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+`;
+
+export default function App() {
+  const [name, setName] = useState("");
+  const [exerciseStarted, setExerciseStarted] = useState(false);
+  const [counter, setCounter] = useState(0);
+  const [image, setImage] = useState(""); // ✅ State for Webcam Frame
+
+  function saveName() {
+    if (!name.trim()) {
+      Swal.fire({ icon: "error", title: "Oops...", text: "Please enter your name." });
+      return;
+    }
+
+    Swal.fire({ icon: "success", title: "Success!", text: `Hi, ${name}!` });
+    setExerciseStarted(false);
+  }
+
+  function startExercise() {
+    setExerciseStarted(true);
+    startWebSocket(setCounter, setImage); // ✅ Start WebSocket
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Container>
+      <Title>Virtual PE Coach</Title>
 
-export default App
+      <div>
+        <NameInput type="text" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
+        <Button onClick={saveName}>Save Name</Button>
+      </div>
+
+      {!exerciseStarted && <Button onClick={startExercise}>Start Bicep Curls</Button>}
+
+      {exerciseStarted && (
+        <>
+          <h2>Reps: {counter}</h2>
+          {image && <WebcamFeed src={image} alt="Webcam Feed" />}
+        </>
+      )}
+    </Container>
+  );
+}
