@@ -1,12 +1,11 @@
 from fastapi import FastAPI
-# from routes import users, exercises, feedback
+from routes import exercises, websocket
 
 app = FastAPI()
 
-# Include routes
-# app.include_router(users.router)
-# app.include_router(exercises.router)
-# app.include_router(feedback.router)
+# Include routers
+app.include_router(exercises.router)
+app.include_router(websocket.router)
 
 @app.get("/")
 def home():
