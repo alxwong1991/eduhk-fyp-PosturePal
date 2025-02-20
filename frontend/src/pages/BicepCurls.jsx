@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
+import { showResult } from '../components/ShowResult'
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
 import Swal from "sweetalert2";
@@ -81,14 +82,7 @@ export default function BicepCurls() {
           setExerciseFinished(true);
           setIsExerciseRunning(false); // ✅ Show buttons again after exercise
           ws.close();
-
-          // ✅ Show SweetAlert2 results popup with just a "Close" button
-          Swal.fire({
-            title: "Workout Complete! 🎉",
-            text: `You completed ${data.total_reps} reps!`,
-            icon: "success",
-            confirmButtonText: "Close",
-          });
+          showResult(data.total_reps)
         }
       };
 
