@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
+import Swal from "sweetalert2";
 import axios from "axios";
 
 const Container = styled.div`
@@ -49,6 +50,8 @@ export default function BicepCurls() {
   const [name, setName] = useState("");
   const [counter, setCounter] = useState(0);
   const [image, setImage] = useState("");
+  const [exerciseFinished, setExerciseFinished] = useState(false);
+  const [isExerciseRunning, setIsExerciseRunning] = useState(false); // ✅ Track if exercise is running
   const navigate = useNavigate();
 
   async function startExercise() {
@@ -56,20 +59,36 @@ export default function BicepCurls() {
 
     setCounter(0);
     setImage("");
+    setExerciseFinished(false);
+    setIsExerciseRunning(true); // ✅ Hide buttons when exercise starts
 
     await showCountdown();
 
     try {
-      // ✅ Use Axios instead of fetch
       await axios.get(`${API_BASE_URL}/start_streaming`);
 
       const ws = new WebSocket(`${WEBSOCKET_URL}/start_bicep_curls`);
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+
         if (data.event === "update_frame") {
           setImage(`data:image/jpeg;base64,${data.image}`);
           setCounter(data.counter);
+        }
+
+        if (data.event === "exercise_complete") {
+          setExerciseFinished(true);
+          setIsExerciseRunning(false); // ✅ Show buttons again after exercise
+          ws.close();
+
+          // ✅ Show SweetAlert2 results popup with just a "Close" button
+          Swal.fire({
+            title: "Workout Complete! 🎉",
+            text: `You completed ${data.total_reps} reps!`,
+            icon: "success",
+            confirmButtonText: "Close",
+          });
         }
       };
 
@@ -78,13 +97,15 @@ export default function BicepCurls() {
     } catch (error) {
       console.error("Axios Error:", error.response?.data || error.message);
       alert("Error starting exercise. Please check your backend.");
+      setIsExerciseRunning(false); // ✅ Show buttons again if an error occurs
     }
   }
 
   return (
     <Container>
       <Title>Bicep Curls</Title>
-      {!name ? (
+
+      {!isExerciseRunning && !name && ( // ✅ Show input only when exercise is NOT running
         <>
           <Input
             type="text"
@@ -94,13 +115,22 @@ export default function BicepCurls() {
           />
           <Button onClick={() => setName(name)}>Continue</Button>
         </>
-      ) : (
+      )}
+
+      {name && (
         <>
           <h2>Welcome, {name}!</h2>
-          <Button onClick={startExercise}>Start Exercise</Button>
-          <h2>Reps: {counter}</h2>
+
+          {!isExerciseRunning && ( // ✅ Hide buttons when exercise is running
+            <>
+              <Button onClick={startExercise} disabled={exerciseFinished}>
+                {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
+              </Button>
+              <Button onClick={() => navigate("/")}>Back to Menu</Button>
+            </>
+          )}
+
           <Webcam image={image} />
-          <Button onClick={() => navigate("/")}>Back to Menu</Button>
         </>
       )}
     </Container>
