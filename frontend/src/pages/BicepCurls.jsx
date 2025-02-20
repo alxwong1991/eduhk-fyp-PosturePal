@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { showCountDown } from "../components/ShowCountdown";
+import { showCountdown } from "../components/ShowCountdown";
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
+import axios from "axios";
 
 const Container = styled.div`
   display: flex;
@@ -56,20 +57,28 @@ export default function BicepCurls() {
     setCounter(0);
     setImage("");
 
-    await showCountDown();
-    fetch(`${API_BASE_URL}/start_streaming`);
+    await showCountdown();
 
-    const ws = new WebSocket(`${WEBSOCKET_URL}/start_bicep_curls`);
+    try {
+      // ✅ Use Axios instead of fetch
+      await axios.get(`${API_BASE_URL}/start_streaming`);
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.event === "update_frame") {
-        setImage(`data:image/jpeg;base64,${data.image}`);
-        setCounter(data.counter);
-      }
-    };
+      const ws = new WebSocket(`${WEBSOCKET_URL}/start_bicep_curls`);
 
-    ws.onclose = () => setImage("");
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.event === "update_frame") {
+          setImage(`data:image/jpeg;base64,${data.image}`);
+          setCounter(data.counter);
+        }
+      };
+
+      ws.onclose = () => setImage("");
+      ws.onerror = (error) => console.error("WebSocket Error:", error);
+    } catch (error) {
+      console.error("Axios Error:", error.response?.data || error.message);
+      alert("Error starting exercise. Please check your backend.");
+    }
   }
 
   return (
