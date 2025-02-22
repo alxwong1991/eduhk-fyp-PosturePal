@@ -56,7 +56,8 @@ npm run dev
 
 ## 📌 Environment Variables Setup 📌
 
-Frontend (.env)
+### **Frontend (`.env`)**
+```env
 VITE_API_BASE_URL=http://localhost:8000
 VITE_WEBSOCKET_URL=ws://localhost:8000
 
