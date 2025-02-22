@@ -1,7 +1,7 @@
-🚀 PosturePal - AI Exercise Tracker
+# 🚀 PosturePal - AI Exercise Tracker
 PosturePal is an AI-powered exercise tracking application that uses computer vision to count repetitions and monitor form for exercises like Bicep Curls and Squats in real-time.
 
-✨ Features
+## ✨ Features
 ✅ Real-time Exercise Tracking – Uses AI to count repetitions
 ✅ Form Detection – Monitors posture to ensure proper form
 ✅ Webcam Integration – Track workouts via a webcam
@@ -11,7 +11,7 @@ PosturePal is an AI-powered exercise tracking application that uses computer vis
 🏋️ Bicep Curls
 🏋️ Squats
 
-📋 Prerequisites
+## 📋 Prerequisites
 Before getting started, ensure you have the following installed:
 
 Python 3.8+
@@ -20,38 +20,41 @@ npm 6.x+
 A webcam
 Git
 
-🛠 Quick Start Guide
+“***”
 
-📌 Backend Setup 📌
+# 🛠 Quick Start Guide
 
-1️⃣ Create and activate a virtual environment
+## 📌 Backend Setup 📌
 
-# Windows
+### 1️⃣ Create and activate a virtual environment
+
+Windows
 python -m venv venv
 venv\Scripts\activate
 
-# macOS/Linux
+macOS/Linux
 python3 -m venv venv
 source venv/bin/activate
 
-2️⃣ Install required dependencies
+### 2️⃣ Install required dependencies
 
 pip install -r requirements.txt
 
-3️⃣ Start the backend server
+### 3️⃣ Start the backend server
 
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
-📌 Frontend Setup 📌
-1️⃣ Install dependencies
+## 📌 Frontend Setup 📌
+
+### 1️⃣ Install dependencies
 
 npm install
 
-2️⃣ Start the frontend development server
+### 2️⃣ Start the frontend development server
 
 npm run dev
 
-📌 Environment Variables Setup 📌
+## 📌 Environment Variables Setup 📌
 
 Frontend (.env)
 VITE_API_BASE_URL=http://localhost:8000
