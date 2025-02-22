@@ -16,11 +16,11 @@ This is my final year project at **EDUHK**. **PosturePal** is an **AI-powered ex
 ## 📋 Prerequisites
 Before getting started, ensure you have the following installed:
 
-Python 3.8+
-Node.js 14.x+
-npm 6.x+
-A webcam
-Git
+- Python 3.8+
+- Node.js 14.x+
+- npm 6.x+
+- A webcam
+- Git
 
 # 🛠 Quick Start Guide
 
