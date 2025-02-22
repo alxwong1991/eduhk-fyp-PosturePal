@@ -28,30 +28,34 @@ Git
 
 ### 1️⃣ Create and activate a virtual environment
 
-Windows
+### Windows
+```sh
 python -m venv venv
 venv\Scripts\activate
+```sh
 
-macOS/Linux
+### macOS/Linux
+```sh
 python3 -m venv venv
+
 source venv/bin/activate
 
 ### 2️⃣ Install required dependencies
-
+```sh
 pip install -r requirements.txt
 
 ### 3️⃣ Start the backend server
-
+```sh
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 ## 📌 Frontend Setup 📌
 
 ### 1️⃣ Install dependencies
-
+```sh
 npm install
 
 ### 2️⃣ Start the frontend development server
-
+```sh
 npm run dev
 
 ## 📌 Environment Variables Setup 📌
@@ -61,7 +65,8 @@ npm run dev
 VITE_API_BASE_URL=http://localhost:8000
 VITE_WEBSOCKET_URL=ws://localhost:8000
 
-Backend (.env)
+### **Backend (`.env`)**
+```env
 API_HOST=0.0.0.0
 API_PORT=8000
 FRONTEND_ORIGINS=http://localhost:5173
