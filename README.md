@@ -63,3 +63,4 @@ VITE_WEBSOCKET_URL=ws://localhost:8000
 API_HOST=0.0.0.0
 API_PORT=8000
 FRONTEND_ORIGINS=http://localhost:5173
+```env
