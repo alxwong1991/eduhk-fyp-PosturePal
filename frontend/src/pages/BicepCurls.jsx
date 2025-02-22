@@ -6,6 +6,7 @@ import { showCameraError } from '../components/ShowCameraError'
 import { useExerciseWebSocket } from '../hooks/useExerciseWebSocket';
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
+import NavMenu from "../components/NavMenu";
 
 const Container = styled.div`
   display: flex;
@@ -44,10 +45,25 @@ const Button = styled.button`
   }
 `;
 
+const Content = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 2rem;
+`;
+
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function BicepCurls() {
+
+  const [userName, setUserName] = useState("John Doe"); // Replace with actual user data
+
+  const handleLogout = () => {
+    // Add any logout logic here
+    console.log("Logging out...");
+  };
+  
   const [name, setName] = useState("");
   const [isExerciseRunning, setIsExerciseRunning] = useState(false); // ✅ Track if exercise is running
   const [cameraError, setCameraError] = useState(null);
@@ -80,7 +96,6 @@ export default function BicepCurls() {
   return (
     <Container>
       <Title>Bicep Curls</Title>
-
       {!isExerciseRunning && !name && ( // ✅ Show input only when exercise is NOT running
         <>
           <Input
@@ -102,7 +117,7 @@ export default function BicepCurls() {
               <Button onClick={startExercise} disabled={exerciseFinished}>
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </Button>
-              <Button onClick={() => navigate("/")}>Back to Menu</Button>
+              <Button onClick={() => navigate("/dashboard")}>Back to Menu</Button>
             </>
           )}
 
