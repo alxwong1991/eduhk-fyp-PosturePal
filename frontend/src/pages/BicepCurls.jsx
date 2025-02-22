@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import { showResult } from '../components/ShowResult'
+import { showCameraError } from '../components/ShowCameraError'
+import { useExerciseWebSocket } from '../hooks/useExerciseWebSocket';
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
-import Swal from "sweetalert2";
-import axios from "axios";
 
 const Container = styled.div`
   display: flex;
@@ -49,49 +49,31 @@ const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function BicepCurls() {
   const [name, setName] = useState("");
-  const [counter, setCounter] = useState(0);
-  const [image, setImage] = useState("");
-  const [exerciseFinished, setExerciseFinished] = useState(false);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false); // ✅ Track if exercise is running
+  const [cameraError, setCameraError] = useState(null);
   const navigate = useNavigate();
+
+  const {
+    image,
+    exerciseFinished,
+    startWebSocketExercise
+  } = useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
     if (!name) return alert("Please enter your name");
 
-    setCounter(0);
-    setImage("");
-    setExerciseFinished(false);
-    setIsExerciseRunning(true); // ✅ Hide buttons when exercise starts
-
+    setIsExerciseRunning(true);
     await showCountdown();
 
     try {
-      await axios.get(`${API_BASE_URL}/start_streaming`);
-
-      const ws = new WebSocket(`${WEBSOCKET_URL}/start_bicep_curls`);
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.event === "update_frame") {
-          setImage(`data:image/jpeg;base64,${data.image}`);
-          setCounter(data.counter);
-        }
-
-        if (data.event === "exercise_complete") {
-          setExerciseFinished(true);
-          setIsExerciseRunning(false); // ✅ Show buttons again after exercise
-          ws.close();
-          showResult(data.total_reps)
-        }
-      };
-
-      ws.onclose = () => setImage("");
-      ws.onerror = (error) => console.error("WebSocket Error:", error);
+      await startWebSocketExercise("bicep_curls", (totalReps) => {
+        setIsExerciseRunning(false);
+        showResult(name, totalReps);
+      });
     } catch (error) {
-      console.error("Axios Error:", error.response?.data || error.message);
-      alert("Error starting exercise. Please check your backend.");
-      setIsExerciseRunning(false); // ✅ Show buttons again if an error occurs
+      console.error("Camera error:", error);
+      setIsExerciseRunning(false);
+      await showCameraError(error.message);
     }
   }
 

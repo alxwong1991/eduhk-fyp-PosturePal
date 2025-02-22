@@ -1,6 +1,9 @@
 backend
-pip install fastapi uvicorn opencv-python mediapipe websockets
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python3 -m venv venv
+venv\Scripts\activate
+source venv/bin/activate
+pip install fastapi uvicorn opencv-python mediapipe websockets python-dotenv
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload    
 
 frontend
 npm install react-router-dom axios sweetalert2

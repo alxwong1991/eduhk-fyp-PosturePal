@@ -4,10 +4,27 @@ import cv2
 from fastapi import APIRouter, WebSocket
 from modules.camera import Camera
 from exercises.bicep_curls import BicepCurls
+from fastapi import HTTPException
 
 websocket_router = APIRouter()
 camera = Camera()
 bicep_curls = BicepCurls()
+
+@websocket_router.get("/check_camera")
+async def check_camera():
+    """Check if camera is available and working."""
+    try:
+        test_camera = Camera()
+        test_camera.start_capture()
+        ret, frame = test_camera.read_frame()
+        test_camera.release_capture()
+        
+        if not ret or frame is None:
+            raise HTTPException(status_code=400, detail="Camera not working")
+            
+        return {"status": "ok", "message": "Camera is working"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Failed to access camera")
 
 @websocket_router.websocket("/ws/start_bicep_curls")
 async def start_bicep_curls(websocket: WebSocket):

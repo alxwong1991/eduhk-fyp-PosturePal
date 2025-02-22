@@ -39,6 +39,7 @@ export default function Dashboard() {
       <Button onClick={() => navigate("/bicep-curls")}>Bicep Curls</Button>
       <Button disabled>Squats (Coming Soon)</Button>
       <Button disabled>Push-Ups (Coming Soon)</Button>
+      <Button disabled>Running (Coming Soon)</Button>
     </Container>
   );
 }
