@@ -40,6 +40,11 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
+### git bash
+```sh
+source venv/Scripts/activate
+```
+
 ### 2️⃣ Install required dependencies
 ```sh
 pip freeze > requirements.txt
