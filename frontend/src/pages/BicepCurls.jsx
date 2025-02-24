@@ -58,7 +58,7 @@ export default function BicepCurls() {
 
   const [name, setName] = useState("");
   const [isExerciseRunning, setIsExerciseRunning] = useState(false); // ✅ Track if exercise is running
-  const [cameraError, setCameraError] = useState(null);
+  // const [cameraError, setCameraError] = useState(null);
   const navigate = useNavigate();
 
   const {
@@ -68,7 +68,7 @@ export default function BicepCurls() {
   } = useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
-    if (!name) return alert("Please enter your name");
+    // if (!name) return alert("Please enter your name");
 
     setIsExerciseRunning(true);
     await showCountdown();

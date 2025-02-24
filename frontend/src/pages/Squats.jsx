@@ -6,7 +6,6 @@ import { showCameraError } from '../components/ShowCameraError';
 import { useExerciseWebSocket } from '../hooks/useExerciseWebSocket';
 import Webcam from "../components/WebcamFeed";
 import styled from "styled-components";
-import Swal from 'sweetalert2';
 
 const Container = styled.div`
   display: flex;
@@ -57,26 +56,22 @@ export default function Squats() {
     image, 
     exerciseFinished, 
     startWebSocketExercise,
-    checkCamera 
   } = useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
-    if (!name) {
-      return Swal.fire({
-        title: "Hold on!",
-        text: "Please enter your name before starting the exercise",
-        icon: "info",
-        confirmButtonText: "OK",
-        confirmButtonColor: "#3085d6"
-      });
-    }
+    // if (!name) {
+    //   return Swal.fire({
+    //     title: "Hold on!",
+    //     text: "Please enter your name before starting the exercise",
+    //     icon: "info",
+    //     confirmButtonText: "OK",
+    //     confirmButtonColor: "#3085d6"
+    //   });
+    // }
+    setIsExerciseRunning(true);
+    await showCountdown();
     
     try {
-      setIsExerciseRunning(true);
-      
-      await checkCamera();
-      await showCountdown();
-
       await startWebSocketExercise('squats', (totalReps) => {
         setIsExerciseRunning(false);
         showResult(name, totalReps);
