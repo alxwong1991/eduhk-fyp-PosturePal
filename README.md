@@ -42,12 +42,13 @@ source venv/bin/activate
 
 ### 2️⃣ Install required dependencies
 ```sh
+pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
 ### 3️⃣ Start the backend server
 ```sh
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn main:app
 ```
 
 ## 📌 Frontend Setup 📌
