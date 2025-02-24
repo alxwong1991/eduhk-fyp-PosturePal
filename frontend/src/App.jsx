@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import BicepCurls from "./pages/BicepCurls";
-// import Squats from "./pages/Squats";
+import Squats from "./pages/Squats";
 
 export default function App() {
   return (
@@ -18,7 +18,7 @@ export default function App() {
         
         {/* Exercise Routes */}
         <Route path="/bicep-curls" element={<BicepCurls />} />
-        {/* <Route path="/squats" element={<Squats />} /> */}
+        <Route path="/squats" element={<Squats />} />
 
         {/* Catch all undefined routes */}
         <Route path="*" element={<Navigate to="/" replace />} />

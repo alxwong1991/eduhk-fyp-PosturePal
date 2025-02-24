@@ -4,6 +4,7 @@ import cv2
 from fastapi import APIRouter, WebSocket
 from modules.camera import Camera
 from exercises.bicep_curls import BicepCurls
+from exercises.squats import Squats
 from fastapi import HTTPException
 
 websocket_router = APIRouter()

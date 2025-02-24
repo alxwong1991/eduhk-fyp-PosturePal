@@ -113,7 +113,7 @@ export default function Squats() {
               <Button onClick={startExercise} disabled={exerciseFinished}>
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </Button>
-              <Button onClick={() => navigate("/")}>Back to Menu</Button>
+              <Button onClick={() => navigate("/dashboard")}>Back to Menu</Button>
             </>
           )}
 

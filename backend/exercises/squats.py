@@ -94,9 +94,7 @@ class Squats:
 
             # Display angle at knee
             knee_coords = tuple(np.multiply(knee, [frame.shape[1], frame.shape[0]]).astype(int))
-            cv2.putText(image, str(int(angle)), knee_coords, 
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-
+            cv2.putText(image, str(int(angle)), knee_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         else:
             angle = 0
 

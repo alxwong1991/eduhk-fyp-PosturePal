@@ -110,7 +110,7 @@ export default function Dashboard() {
       icon: "🏃",
       title: "Squats",
       path: "/squats",
-      available: false,
+      available: true,
     },
     {
       icon: "👊",
