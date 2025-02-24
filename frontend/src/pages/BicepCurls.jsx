@@ -1,64 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
-import { showResult } from '../components/ShowResult'
-import { showCameraError } from '../components/ShowCameraError'
+import { showResult } from '../components/ShowResult';
+import { showCameraError } from '../components/ShowCameraError';
 import { useExerciseWebSocket } from '../hooks/useExerciseWebSocket';
 import Webcam from "../components/WebcamFeed";
-import styled from "styled-components";
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: #222;
-  color: white;
-`;
-
-const Title = styled.h1`
-  font-size: 36px;
-  margin-bottom: 10px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  margin: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: none;
-`;
-
-const Button = styled.button`
-  padding: 12px 20px;
-  margin: 10px;
-  background-color: #337ab7;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 18px;
-  &:hover {
-    background-color: #286090;
-  }
-`;
-
-const Content = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin-top: 2rem;
-`;
-
+import {
+  ExerciseContainer,
+  ExerciseLeftSide,
+  ExerciseRightSide,
+  ExerciseTitle,
+  ExerciseInput,
+  ExerciseButton
+} from "../styles/exerciseStyles"; // Import modular styles
+import { WebcamFrame } from "../styles/exerciseStyles";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function BicepCurls() {
-
   const [name, setName] = useState("");
-  const [isExerciseRunning, setIsExerciseRunning] = useState(false); // ✅ Track if exercise is running
-  // const [cameraError, setCameraError] = useState(null);
+  const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
   const {
@@ -68,8 +30,6 @@ export default function BicepCurls() {
   } = useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
-    // if (!name) return alert("Please enter your name");
-
     setIsExerciseRunning(true);
     await showCountdown();
 
@@ -86,36 +46,47 @@ export default function BicepCurls() {
   }
 
   return (
-    <Container>
-      <Title>Bicep Curls</Title>
-      {!isExerciseRunning && !name && ( // ✅ Show input only when exercise is NOT running
-        <>
-          <Input
-            type="text"
-            placeholder="Enter your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Button onClick={() => setName(name)}>Continue</Button>
-        </>
-      )}
+    <ExerciseContainer>
+      {/* Left Side - Title, User Input, and Exercise Controls */}
+      <ExerciseLeftSide>
+        <ExerciseTitle>Bicep Curls</ExerciseTitle>
 
-      {name && (
-        <>
-          <h2>Welcome, {name}!</h2>
+        {!isExerciseRunning && !name && (
+          <>
+            <ExerciseInput
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <ExerciseButton onClick={() => setName(name)}>Continue</ExerciseButton>
+          </>
+        )}
 
-          {!isExerciseRunning && ( // ✅ Hide buttons when exercise is running
-            <>
-              <Button onClick={startExercise} disabled={exerciseFinished}>
-                {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
-              </Button>
-              <Button onClick={() => navigate("/dashboard")}>Back to Menu</Button>
-            </>
-          )}
+        {name && (
+          <>
+            <h2>Welcome, {name}!</h2>
 
+            {!isExerciseRunning && (
+              <>
+                <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
+                  {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
+                </ExerciseButton>
+                <ExerciseButton onClick={() => navigate("/dashboard")}>
+                  Back to Menu
+                </ExerciseButton>
+              </>
+            )}
+          </>
+        )}
+      </ExerciseLeftSide>
+
+      {/* Right Side - Webcam Feed */}
+      <ExerciseRightSide>
+        <WebcamFrame>
           <Webcam image={image} />
-        </>
-      )}
-    </Container>
+        </WebcamFrame>
+      </ExerciseRightSide>
+    </ExerciseContainer>
   );
 }

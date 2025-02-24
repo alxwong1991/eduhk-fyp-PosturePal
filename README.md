@@ -53,7 +53,7 @@ pip install -r requirements.txt
 
 ### 3️⃣ Start the backend server
 ```sh
-uvicorn main:app
+uvicorn main:app --reload
 ```
 
 ## 📌 Frontend Setup 📌
