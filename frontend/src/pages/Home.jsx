@@ -120,7 +120,7 @@ export default function Home() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Add your login logic here
     try {
       // Simulate login success
@@ -138,7 +138,7 @@ export default function Home() {
   return (
     <Container>
       <LogoSection>
-        <Logo onClick={() => navigate('/')} large />
+        <Logo onClick={() => navigate("/")} large />
       </LogoSection>
       <FormCard>
         <Title>Welcome Back</Title>
@@ -165,10 +165,13 @@ export default function Home() {
         </Form>
         <LinkText>
           Don't have an account?
-          <a href="/register" onClick={(e) => {
-            e.preventDefault();
-            navigate("/register");
-          }}>
+          <a
+            href="/register"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/register");
+            }}
+          >
             Register
           </a>
         </LinkText>

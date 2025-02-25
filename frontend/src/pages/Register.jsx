@@ -105,7 +105,7 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       Swal.fire({
         title: "Error",
@@ -138,9 +138,7 @@ export default function Register() {
             type="text"
             placeholder="Full Name"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
@@ -174,10 +172,13 @@ export default function Register() {
         </Form>
         <LinkText>
           Already have an account?
-          <a href="/" onClick={(e) => {
-            e.preventDefault();
-            navigate("/");
-          }}>
+          <a
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+            }}
+          >
             Login
           </a>
         </LinkText>
