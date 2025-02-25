@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+console.log("VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("VITE_WEBSOCKET_URL:", import.meta.env.VITE_WEBSOCKET_URL);
+
 // // ✅ Ensure `.env` variables are loaded correctly
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 // const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:8000";

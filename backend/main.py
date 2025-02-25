@@ -5,9 +5,7 @@ from routes.video import video_router
 from routes.websocket import websocket_router
 from dotenv import load_dotenv
 
-# ✅ Load `.env` from `config/`
-ENV_PATH = os.path.join(os.getcwd(), "config", ".env")
-load_dotenv(dotenv_path=ENV_PATH, override=True)
+load_dotenv(override=True)
 
 API_HOST = os.getenv("API_HOST")
 API_PORT = int(os.getenv("API_PORT"))
@@ -32,4 +30,5 @@ def home():
 
 if __name__ == "__main__":
     import uvicorn
+    print("🚀 Starting FastAPI server...")
     uvicorn.run(app, host=API_HOST, port=API_PORT)

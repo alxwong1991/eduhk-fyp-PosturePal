@@ -72,13 +72,13 @@ npm run dev
 
 ### Create enviroment variables for both backend and frontend folders
 
-### **Frontend (`config/.env`)**
+### **Frontend (`.env`)**
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 VITE_WEBSOCKET_URL=ws://localhost:8000
 ```
 
-### **Backend (`config/.env`)**
+### **Backend (`.env`)**
 ```env
 API_HOST=0.0.0.0
 API_PORT=8000

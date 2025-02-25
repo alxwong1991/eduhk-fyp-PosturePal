@@ -104,7 +104,22 @@ const ExerciseButton = styled.button`
   }
 `;
 
-// Reusable layout component
+// ✅ Moved WebcamFeed component inside ExerciseLayout
+const WebcamFeed = ({ image, isActive }) => {
+  return (
+    <WebcamFrame isActive={isActive}>
+      {image ? (
+        <img src={image} alt="Webcam Feed" style={{ width: "100%", height: "100%", borderRadius: "10px" }} />
+      ) : (
+        <p style={{ color: "#ccc", textAlign: "center", padding: "20px" }}>
+          No Camera Feed Available
+        </p>
+      )}
+    </WebcamFrame>
+  );
+};
+
+// ✅ Reusable layout component with integrated WebcamFeed
 const ExerciseLayout = ({ title, children, image, isActive }) => {
   return (
     <ExerciseContainer>
@@ -114,9 +129,7 @@ const ExerciseLayout = ({ title, children, image, isActive }) => {
       </ExerciseLeftSide>
 
       <ExerciseRightSide>
-        <WebcamFrame isActive={isActive}>
-          {image ? <img src={image} alt="Webcam Feed" style={{ width: "100%", height: "100%", borderRadius: "10px" }} /> : null}
-        </WebcamFrame>
+        <WebcamFeed image={image} isActive={isActive} /> {/* ✅ Integrated WebcamFeed here */}
       </ExerciseRightSide>
     </ExerciseContainer>
   );
@@ -124,10 +137,10 @@ const ExerciseLayout = ({ title, children, image, isActive }) => {
 
 // ✅ Add PropTypes Validation
 ExerciseLayout.propTypes = {
-  title: PropTypes.string.isRequired, // ✅ Ensures title is a required string
-  children: PropTypes.node.isRequired, // ✅ Ensures children is a valid React node
-  image: PropTypes.string, // ✅ Ensures image is a string (Base64 or URL)
-  isActive: PropTypes.bool, // ✅ Ensures isActive is a boolean
+  title: PropTypes.string.isRequired, // Ensures title is a required string
+  children: PropTypes.node.isRequired, // Ensures children is a valid React node
+  image: PropTypes.string, // Ensures image is a string (Base64 or URL)
+  isActive: PropTypes.bool, // Ensures isActive is a boolean
 };
 
 // ✅ Default Props (Optional)
