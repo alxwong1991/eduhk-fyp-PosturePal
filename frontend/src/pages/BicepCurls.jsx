@@ -4,16 +4,7 @@ import { showCountdown } from "../components/ShowCountdown";
 import { showResult } from '../components/ShowResult';
 import { showCameraError } from '../components/ShowCameraError';
 import { useExerciseWebSocket } from '../hooks/useExerciseWebSocket';
-import Webcam from "../components/WebcamFeed";
-import {
-  ExerciseContainer,
-  ExerciseLeftSide,
-  ExerciseRightSide,
-  ExerciseTitle,
-  ExerciseInput,
-  ExerciseButton
-} from "../styles/exerciseStyles"; // Import modular styles
-import { WebcamFrame } from "../styles/exerciseStyles";
+import { ExerciseLayout, ExerciseInput, ExerciseButton } from "../components/ExerciseLayout";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
@@ -36,7 +27,7 @@ export default function BicepCurls() {
     try {
       await startWebSocketExercise("bicep_curls", (totalReps) => {
         setIsExerciseRunning(false);
-        showResult(name, totalReps);
+        showResult(totalReps);
       });
     } catch (error) {
       console.error("Camera error:", error);
@@ -46,47 +37,35 @@ export default function BicepCurls() {
   }
 
   return (
-    <ExerciseContainer>
-      {/* Left Side - Title, User Input, and Exercise Controls */}
-      <ExerciseLeftSide>
-        <ExerciseTitle>Bicep Curls</ExerciseTitle>
+    <ExerciseLayout title="Bicep Curls" image={image} isActive={isExerciseRunning}>
+      {!isExerciseRunning && !name && (
+        <>
+          <ExerciseInput
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <ExerciseButton onClick={() => setName(name)}>Continue</ExerciseButton>
+        </>
+      )}
 
-        {!isExerciseRunning && !name && (
-          <>
-            <ExerciseInput
-              type="text"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <ExerciseButton onClick={() => setName(name)}>Continue</ExerciseButton>
-          </>
-        )}
+      {name && (
+        <>
+          <h2>Welcome, {name}!</h2>
 
-        {name && (
-          <>
-            <h2>Welcome, {name}!</h2>
-
-            {!isExerciseRunning && (
-              <>
-                <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
-                  {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
-                </ExerciseButton>
-                <ExerciseButton onClick={() => navigate("/dashboard")}>
-                  Back to Menu
-                </ExerciseButton>
-              </>
-            )}
-          </>
-        )}
-      </ExerciseLeftSide>
-
-      {/* Right Side - Webcam Feed */}
-      <ExerciseRightSide>
-        <WebcamFrame>
-          <Webcam image={image} />
-        </WebcamFrame>
-      </ExerciseRightSide>
-    </ExerciseContainer>
+          {!isExerciseRunning && (
+            <>
+              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
+                {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
+              </ExerciseButton>
+              <ExerciseButton onClick={() => navigate("/dashboard")}>
+                Back to Menu
+              </ExerciseButton>
+            </>
+          )}
+        </>
+      )}
+    </ExerciseLayout>
   );
 }
