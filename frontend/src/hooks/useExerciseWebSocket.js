@@ -1,11 +1,23 @@
-import { useState } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-export function useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL) {
+// // ✅ Ensure `.env` variables are loaded correctly
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+// const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:8000";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
+
+if (!API_BASE_URL || !WEBSOCKET_URL) {
+  throw new Error("Missing required environment variables: VITE_API_BASE_URL or VITE_WEBSOCKET_URL");
+}
+
+export function useExerciseWebSocket() {
   const [image, setImage] = useState("");
   const [counter, setCounter] = useState(0);
   const [exerciseFinished, setExerciseFinished] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [webSocket, setWebSocket] = useState(null); // ✅ Store WebSocket instance
 
   const checkCamera = async () => {
     try {
@@ -14,13 +26,7 @@ export function useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL) {
       return true;
     } catch (error) {
       setIsCameraReady(false);
-      if (error.response?.status === 400) {
-        throw new Error(error.response.data.detail || "Camera not working properly");
-      } else if (error.code === "ERR_NETWORK") {
-        throw new Error("Cannot connect to server. Please check if the server is running.");
-      } else {
-        throw new Error("Failed to access camera. Please check your camera connection.");
-      }
+      throw new Error(error.response?.data?.detail || "Camera not working properly");
     }
   };
 
@@ -30,28 +36,22 @@ export function useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL) {
     setExerciseFinished(false);
 
     try {
-      // Check camera first
       await checkCamera();
-      
-      // Only proceed if camera check passed
       await axios.get(`${API_BASE_URL}/start_streaming`);
-      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}`);
 
-      ws.onopen = () => {
-        console.log("WebSocket connection established");
-      };
+      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}`);
+      setWebSocket(ws);
 
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
-
         if (data.event === "update_frame") {
           setImage(`data:image/jpeg;base64,${data.image}`);
           setCounter(data.counter);
         }
-
         if (data.event === "exercise_complete") {
           setExerciseFinished(true);
           ws.close();
+          setWebSocket(null);
           onComplete?.(data.total_reps);
         }
       };
@@ -59,10 +59,12 @@ export function useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL) {
       ws.onclose = () => {
         setImage("");
         setIsCameraReady(false);
+        setWebSocket(null);
       };
 
       ws.onerror = (error) => {
         console.error("WebSocket Error:", error);
+        setWebSocket(null);
         throw new Error("Connection to exercise server failed");
       };
 
@@ -72,6 +74,15 @@ export function useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL) {
       throw error;
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (webSocket) {
+        webSocket.close();
+        setWebSocket(null);
+      }
+    };
+  }, [webSocket]);
 
   return {
     image,
