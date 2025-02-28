@@ -18,6 +18,7 @@ class BicepCurls:
         self.timer_started = False
 
         self.ui_renderer = UIRenderer()
+        self.feedback_message = ""  # ✅ Stores feedback message
 
     def reset_counter(self):
         """✅ Reset counter and restart the timer."""
@@ -27,9 +28,7 @@ class BicepCurls:
 
     def calculate_angle(self, a, b, c):
         """Calculate the angle between three points."""
-        a = np.array(a)
-        b = np.array(b)
-        c = np.array(c)
+        a, b, c = np.array(a), np.array(b), np.array(c)
 
         radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
         angle = np.abs(radians * 180.0 / np.pi)
@@ -58,6 +57,24 @@ class BicepCurls:
 
         return self.counter
 
+    def provide_feedback(self, angle):
+        """✅ Give real-time feedback based on form."""
+        if angle > 160:
+            self.feedback_message = "⚠️ Fully extend your arm!"
+        elif angle < 30:
+            self.feedback_message = "✅ Great contraction!"
+        elif 75 < angle < 100:
+            self.feedback_message = "⚠️ Keep your back straight!"
+        else:
+            self.feedback_message = ""
+
+    def draw_progress_bar(self, image):
+        """✅ Draws a visual progress bar."""
+        progress = int((self.counter % 10) * 10)  # Each 10 reps = full bar
+        cv2.rectangle(image, (50, 300), (50 + progress, 320), (0, 255, 0), -1)
+        cv2.putText(image, f'Progress: {self.counter % 10}/10', (50, 340), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
     def perform_exercise(self, frame):
         """Process frame and track bicep curls exercise."""
         if not self.timer_started:
@@ -81,8 +98,18 @@ class BicepCurls:
 
             angle = self.calculate_angle(shoulder, elbow, wrist)
             self.counter = self.update(angle)
-            
+
+            self.provide_feedback(angle)  # ✅ Provide real-time feedback
+
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
+
+            # ✅ Draw progress bar
+            self.draw_progress_bar(image)
+
+            # ✅ Draw feedback message
+            if self.feedback_message:
+                cv2.putText(image, self.feedback_message, (50, 400), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
             mp_drawing.draw_landmarks(
                 image, landmarks, mp_pose.POSE_CONNECTIONS,
@@ -90,6 +117,7 @@ class BicepCurls:
                 connection_drawing_spec=mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
             )
 
+            # ✅ Display angle
             elbow_coords = tuple(np.multiply(elbow, [frame.shape[1], frame.shape[0]]).astype(int))
             cv2.putText(image, str(angle), elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
         else:
