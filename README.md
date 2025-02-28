@@ -24,6 +24,23 @@ Before getting started, ensure you have the following installed:
 
 # 🛠 Quick Start Guide
 
+## 📌 Environment Variables Setup 📌
+
+### Create enviroment variables for both backend and frontend folders
+
+### **Frontend (`.env`)**
+```env
+VITE_API_BASE_URL=http://localhost:8000
+VITE_WEBSOCKET_URL=ws://localhost:8000
+```
+
+### **Backend (`.env`)**
+```env
+API_HOST=0.0.0.0
+API_PORT=8000
+FRONTEND_ORIGINS=http://localhost:5173
+```
+
 ## 📌 Backend Setup 📌
 
 ### 1️⃣ Create and activate a virtual environment
@@ -66,21 +83,4 @@ npm install
 ### 2️⃣ Start the frontend development server
 ```sh
 npm run dev
-```
-
-## 📌 Environment Variables Setup 📌
-
-### Create enviroment variables for both backend and frontend folders
-
-### **Frontend (`.env`)**
-```env
-VITE_API_BASE_URL=http://localhost:8000
-VITE_WEBSOCKET_URL=ws://localhost:8000
-```
-
-### **Backend (`.env`)**
-```env
-API_HOST=0.0.0.0
-API_PORT=8000
-FRONTEND_ORIGINS=http://localhost:5173
 ```
