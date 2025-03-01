@@ -13,7 +13,7 @@ export function useExerciseWebSocket() {
   const [counter, setCounter] = useState(0);
   const [exerciseFinished, setExerciseFinished] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const [webSocket, setWebSocket] = useState(null); // ✅ Store WebSocket instance
+  const [webSocket, setWebSocket] = useState(null);
 
   const checkCamera = async () => {
     try {
@@ -26,7 +26,7 @@ export function useExerciseWebSocket() {
     }
   };
 
-  const startWebSocketExercise = async (exerciseType, onComplete) => {
+  const startWebSocketExercise = async (exerciseType, difficulty, onComplete) => {
     setCounter(0);
     setImage("");
     setExerciseFinished(false);
@@ -35,7 +35,8 @@ export function useExerciseWebSocket() {
       await checkCamera();
       await axios.get(`${API_BASE_URL}/start_streaming`);
 
-      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}`);
+      // ✅ Pass difficulty as a query parameter to the WebSocket
+      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}?difficulty=${difficulty}`);
       setWebSocket(ws);
 
       ws.onmessage = (event) => {

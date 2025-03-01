@@ -4,6 +4,7 @@ from mediapipe.python.solutions import drawing_utils as mp_drawing
 from mediapipe.python.solutions import pose as mp_pose
 from modules.countdown_timer import CountdownTimer
 from modules.ui_renderer import UIRenderer
+from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 class BicepCurls:
     def __init__(self):
@@ -11,6 +12,7 @@ class BicepCurls:
         self.counter = 0
         self.stage = None
         self.pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)  
 
         # ✅ Countdown timer (30 seconds)
         self.timer = 30
@@ -19,6 +21,10 @@ class BicepCurls:
 
         self.ui_renderer = UIRenderer()
         self.feedback_message = ""  # ✅ Stores feedback message
+
+    def set_difficulty(self, difficulty):
+        """✅ Dynamically update max reps based on difficulty."""
+        self.max_reps = DIFFICULTY_LEVELS["bicep_curls"].get(difficulty, self.max_reps)
 
     def reset_counter(self):
         """✅ Reset counter and restart the timer."""
@@ -57,25 +63,7 @@ class BicepCurls:
 
         return self.counter
 
-    def provide_feedback(self, angle):
-        """✅ Give real-time feedback based on form."""
-        if angle > 160:
-            self.feedback_message = "⚠️ Fully extend your arm!"
-        elif angle < 30:
-            self.feedback_message = "✅ Great contraction!"
-        elif 75 < angle < 100:
-            self.feedback_message = "⚠️ Keep your back straight!"
-        else:
-            self.feedback_message = ""
-
-    def draw_progress_bar(self, image):
-        """✅ Draws a visual progress bar."""
-        progress = int((self.counter % 10) * 10)  # Each 10 reps = full bar
-        cv2.rectangle(image, (50, 300), (50 + progress, 320), (0, 255, 0), -1)
-        cv2.putText(image, f'Progress: {self.counter % 10}/10', (50, 340), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-
-    def perform_exercise(self, frame):
+    def perform_exercise(self, frame, max_reps):
         """Process frame and track bicep curls exercise."""
         if not self.timer_started:
             self.timer_instance.start()  # ✅ Start timer when first frame is processed
@@ -98,18 +86,10 @@ class BicepCurls:
 
             angle = self.calculate_angle(shoulder, elbow, wrist)
             self.counter = self.update(angle)
-
-            self.provide_feedback(angle)  # ✅ Provide real-time feedback
+            self.ui_renderer.provide_feedback_bicep_curls(angle, image)
+            self.ui_renderer.draw_progress_bar_bicep_curls(image, self.counter, max_reps)
 
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
-
-            # ✅ Draw progress bar
-            self.draw_progress_bar(image)
-
-            # ✅ Draw feedback message
-            if self.feedback_message:
-                cv2.putText(image, self.feedback_message, (50, 400), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
             mp_drawing.draw_landmarks(
                 image, landmarks, mp_pose.POSE_CONNECTIONS,

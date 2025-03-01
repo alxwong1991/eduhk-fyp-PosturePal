@@ -8,13 +8,14 @@ import {
   ExerciseLayout,
   ExerciseInput,
   ExerciseButton,
-} from "../components/ExerciseLayout"; // ✅ Uses updated layout
+} from "../components/ExerciseLayout";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function BicepCurls() {
   const [name, setName] = useState("");
+  const [difficulty, setDifficulty] = useState(null);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
@@ -22,11 +23,13 @@ export default function BicepCurls() {
     useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
+    if (!difficulty) return; // Ensure difficulty is selected
+
     setIsExerciseRunning(true);
     await showCountdown();
 
     try {
-      await startWebSocketExercise("bicep_curls", (totalReps) => {
+      await startWebSocketExercise("bicep_curls", difficulty, (totalReps) => {
         setIsExerciseRunning(false);
         showResult(totalReps);
       });
@@ -51,22 +54,27 @@ export default function BicepCurls() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <ExerciseButton onClick={() => setName(name)}>
-            Continue
-          </ExerciseButton>
+          <ExerciseButton onClick={() => setName(name)}>Continue</ExerciseButton>
         </>
       )}
 
-      {name && (
+      {name && !difficulty && (
         <>
           <h2>Welcome, {name}!</h2>
+          <h3>Select Difficulty:</h3>
+          <ExerciseButton onClick={() => setDifficulty("easy")}>Easy</ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("medium")}>Medium</ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("hard")}>Hard</ExerciseButton>
+        </>
+      )}
+
+      {difficulty && (
+        <>
+          <h2>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h2>
 
           {!isExerciseRunning && (
             <>
-              <ExerciseButton
-                onClick={startExercise}
-                disabled={exerciseFinished}
-              >
+              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>

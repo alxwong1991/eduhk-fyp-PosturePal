@@ -1,7 +1,7 @@
 import asyncio
 import base64
 import cv2
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, Query
 from modules.camera import Camera
 from exercises.bicep_curls import BicepCurls
 from exercises.squats import Squats
@@ -10,7 +10,6 @@ from fastapi import HTTPException
 websocket_router = APIRouter()
 camera = Camera()
 bicep_curls = BicepCurls()
-
 
 # Check Camera
 @websocket_router.get("/check_camera")
@@ -31,12 +30,15 @@ async def check_camera():
 
 # Bicep Curls
 @websocket_router.websocket("/ws/start_bicep_curls")
-async def start_bicep_curls(websocket: WebSocket):
+async def start_bicep_curls(websocket: WebSocket, difficulty: str = Query("")):
     """Handle WebSocket connection for bicep curl tracking."""
     await websocket.accept()
     camera.start_capture()
     
     bicep_curls.reset_counter()  # ✅ Reset counter and start timer
+    bicep_curls.set_difficulty(difficulty)  # ✅ Set difficulty before starting
+
+    max_reps = bicep_curls.max_reps
 
     # ✅ Warm up the camera (Capture a few frames before countdown)
     for _ in range(10):  # Capture 10 frames to warm up the camera
@@ -55,7 +57,11 @@ async def start_bicep_curls(websocket: WebSocket):
         if not ret:
             break
 
-        frame, angle, counter, time_up = bicep_curls.perform_exercise(frame)  # ✅ Get `time_up` flag
+        frame, angle, counter, time_up = bicep_curls.perform_exercise(frame, max_reps)  # ✅ Get `time_up` flag
+
+        # ✅ Pass max_reps to draw_progress_bar_bicep_curls
+        bicep_curls.ui_renderer.draw_progress_bar_bicep_curls(frame, counter, max_reps)
+
         _, buffer = cv2.imencode(".jpg", frame)
         base64_frame = base64.b64encode(buffer).decode("utf-8")
 
@@ -68,8 +74,8 @@ async def start_bicep_curls(websocket: WebSocket):
             "remaining_time": remaining_time
         })
 
-        if time_up:
-            break  # ✅ Stop the loop when time is up
+        if counter >= max_reps or time_up: # Stop when the counter reaches `max_reps`
+            break
 
         await asyncio.sleep(0.1)
 
