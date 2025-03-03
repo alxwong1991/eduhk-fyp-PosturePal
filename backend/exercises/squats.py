@@ -85,7 +85,8 @@ class Squats:
 
             angle = self.calculate_angle(hip, knee, ankle)
             self.counter = self.update(angle)
-            self.ui_renderer.draw_progress_bar(image, self.counter, max_reps)
+            self.ui_renderer.provide_feedback(angle, image, "squats")
+            self.ui_renderer.draw_progress_bar(image, self.counter, max_reps, "squats")
             
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
 
