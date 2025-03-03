@@ -4,6 +4,7 @@ from mediapipe.python.solutions import drawing_utils as mp_drawing
 from mediapipe.python.solutions import pose as mp_pose
 from modules.countdown_timer import CountdownTimer
 from modules.ui_renderer import UIRenderer
+from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 class Squats:
     def __init__(self):
@@ -11,6 +12,7 @@ class Squats:
         self.counter = 0
         self.stage = None
         self.pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
+        self.max_reps = DIFFICULTY_LEVELS.get("squats", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # Countdown timer (30 seconds)
         self.timer = 30
@@ -18,6 +20,9 @@ class Squats:
         self.timer_started = False
 
         self.ui_renderer = UIRenderer()
+
+    def set_difficulty(self, difficulty):
+        self.max_reps = DIFFICULTY_LEVELS["squats"].get(difficulty, self.max_reps)
 
     def reset_counter(self):
         """Reset counter and restart the timer."""
@@ -56,7 +61,7 @@ class Squats:
 
         return self.counter
 
-    def perform_exercise(self, frame):
+    def perform_exercise(self, frame, max_reps):
         """Process frame and track squats exercise."""
         if not self.timer_started:
             self.timer_instance.start()
@@ -80,6 +85,7 @@ class Squats:
 
             angle = self.calculate_angle(hip, knee, ankle)
             self.counter = self.update(angle)
+            self.ui_renderer.draw_progress_bar(image, self.counter, max_reps)
             
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
 

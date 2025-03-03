@@ -54,7 +54,7 @@ class UIRenderer:
         cv2.putText(image, feedback_message, (banner_x + 15, banner_y + 27),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
 
-    def draw_progress_bar_bicep_curls(self, image, counter, max_reps):
+    def draw_progress_bar(self, image, counter, max_reps):
         """✅ Draws a vertical progress bar on the right based on difficulty."""
         bar_height = 200  # Height of the progress bar
         bar_x = image.shape[1] - 60  # Position from the right

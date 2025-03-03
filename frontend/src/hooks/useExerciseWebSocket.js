@@ -36,7 +36,8 @@ export function useExerciseWebSocket() {
       await axios.get(`${API_BASE_URL}/start_streaming`);
 
       // ✅ Pass difficulty as a query parameter to the WebSocket
-      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}?difficulty=${difficulty}`);
+      // const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_${exerciseType}?difficulty=${difficulty}`);
+      const ws = new WebSocket(`${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}`);
       setWebSocket(ws);
 
       ws.onmessage = (event) => {

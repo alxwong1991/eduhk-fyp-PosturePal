@@ -3,15 +3,15 @@ import base64
 import cv2
 from fastapi import APIRouter, WebSocket, Query
 from modules.camera import Camera
-from exercises.bicep_curls import BicepCurls
-from exercises.squats import Squats
+from modules.exercise_helper import ExerciseHelper
 from fastapi import HTTPException
+from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 websocket_router = APIRouter()
 camera = Camera()
-bicep_curls = BicepCurls()
+exercise_helper = ExerciseHelper()
 
-# Check Camera
+# ✅ Check Camera
 @websocket_router.get("/check_camera")
 async def check_camera():
     """Check if camera is available and working."""
@@ -25,29 +25,27 @@ async def check_camera():
             raise HTTPException(status_code=400, detail="Camera not working")
             
         return {"status": "ok", "message": "Camera is working"}
-    except Exception as e:
+    except Exception:
         raise HTTPException(status_code=400, detail="Failed to access camera")
 
-# Bicep Curls
-@websocket_router.websocket("/ws/start_bicep_curls")
-async def start_bicep_curls(websocket: WebSocket, difficulty: str = Query("")):
-    """Handle WebSocket connection for bicep curl tracking."""
+
+# ✅ Dynamic WebSocket for Any Exercise
+@websocket_router.websocket("/ws/start_exercise")
+async def start_exercise(websocket: WebSocket, exercise: str, difficulty: str = Query(DEFAULT_DIFFICULTY)):
+    """✅ Handles all exercises dynamically."""
     await websocket.accept()
     camera.start_capture()
-    
-    bicep_curls.reset_counter()  # ✅ Reset counter and start timer
-    bicep_curls.set_difficulty(difficulty)  # ✅ Set difficulty before starting
 
-    max_reps = bicep_curls.max_reps
+    try:
+        exercise_helper.setup_exercise(exercise)  # ✅ Setup dynamically
+        exercise_helper.set_difficulty(exercise, difficulty)  # ✅ Set difficulty
+    except ValueError as e:
+        await websocket.send_json({"error": str(e)})
+        await websocket.close()
+        return
 
-    # ✅ Warm up the camera (Capture a few frames before countdown)
-    for _ in range(10):  # Capture 10 frames to warm up the camera
-        ret, _ = camera.read_frame()
-        if not ret:
-            break
-        await asyncio.sleep(0.05)  # Small delay for the camera to stabilize
+    max_reps = DIFFICULTY_LEVELS.get(exercise, {}).get(difficulty, 10)  # ✅ Get reps dynamically
 
-    # ✅ Countdown before starting
     for i in range(5, 0, -1):
         await websocket.send_json({"event": "display_countdown", "countdown": i})
         await asyncio.sleep(1)
@@ -57,76 +55,19 @@ async def start_bicep_curls(websocket: WebSocket, difficulty: str = Query("")):
         if not ret:
             break
 
-        frame, angle, counter, time_up = bicep_curls.perform_exercise(frame, max_reps)  # ✅ Get `time_up` flag
-
-        # ✅ Pass max_reps to draw_progress_bar_bicep_curls
-        bicep_curls.ui_renderer.draw_progress_bar_bicep_curls(frame, counter, max_reps)
+        frame, angle, counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
 
         _, buffer = cv2.imencode(".jpg", frame)
         base64_frame = base64.b64encode(buffer).decode("utf-8")
 
-        remaining_time = bicep_curls.timer_instance.get_remaining_time()
-
         await websocket.send_json({
             "event": "update_frame",
             "image": base64_frame,
-            "counter": counter,
-            "remaining_time": remaining_time
+            "counter": counter
         })
 
-        if counter >= max_reps or time_up: # Stop when the counter reaches `max_reps`
-            break
-
-        await asyncio.sleep(0.1)
-
-    camera.release_capture()
-
-    # ✅ Send final result before closing WebSocket
-    await websocket.send_json({
-        "event": "exercise_complete",
-        "message": f"Exercise complete! Total reps: {bicep_curls.counter}",
-        "total_reps": bicep_curls.counter
-    })
-
-    await websocket.close()
-
-# Squats
-@websocket_router.websocket("/ws/start_squats")
-async def start_squats(websocket: WebSocket):
-    """Handle WebSocket connection for squats tracking."""
-    await websocket.accept()
-    camera.start_capture()
-    
-    squats = Squats()  # Create instance of Squats class
-    squats.reset_counter()
-
-    # Warm up the camera
-    for _ in range(10):
-        ret, _ = camera.read_frame()
-        if not ret:
-            break
-        await asyncio.sleep(0.05)
-
-    while camera.cap.isOpened():
-        ret, frame = camera.read_frame()
-        if not ret:
-            break
-
-        frame, angle, counter, time_up = squats.perform_exercise(frame)
-        _, buffer = cv2.imencode(".jpg", frame)
-        base64_frame = base64.b64encode(buffer).decode("utf-8")
-
-        remaining_time = squats.timer_instance.get_remaining_time()
-
-        await websocket.send_json({
-            "event": "update_frame",
-            "image": base64_frame,
-            "counter": counter,
-            "remaining_time": remaining_time
-        })
-
-        if time_up:
-            break
+        if counter >= max_reps or time_up:
+            break  
 
         await asyncio.sleep(0.1)
 
@@ -134,8 +75,8 @@ async def start_squats(websocket: WebSocket):
 
     await websocket.send_json({
         "event": "exercise_complete",
-        "message": f"Exercise complete! Total reps: {squats.counter}",
-        "total_reps": squats.counter
+        "message": f"Exercise complete! Total reps: {counter}",
+        "total_reps": counter
     })
 
     await websocket.close()

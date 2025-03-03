@@ -87,7 +87,7 @@ class BicepCurls:
             angle = self.calculate_angle(shoulder, elbow, wrist)
             self.counter = self.update(angle)
             self.ui_renderer.provide_feedback_bicep_curls(angle, image)
-            self.ui_renderer.draw_progress_bar_bicep_curls(image, self.counter, max_reps)
+            self.ui_renderer.draw_progress_bar(image, self.counter, max_reps)
 
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
 

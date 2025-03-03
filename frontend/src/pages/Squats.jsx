@@ -15,6 +15,7 @@ const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function Squats() {
   const [name, setName] = useState("");
+  const [difficulty, setDifficulty] = useState(null);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
@@ -22,6 +23,8 @@ export default function Squats() {
     useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
 
   async function startExercise() {
+    if (!difficulty) return; // Ensure difficulty is selected
+
     setIsExerciseRunning(true);
     await showCountdown();
 
@@ -38,44 +41,59 @@ export default function Squats() {
   }
 
   return (
-    <ExerciseLayout
-    title="Squats"
-    image={image}
-    isActive={isExerciseRunning}
-  >
-    {!isExerciseRunning && !name && (
-      <>
-        <ExerciseInput
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <ExerciseButton onClick={() => setName(name)}>
-          Continue
-        </ExerciseButton>
-      </>
-    )}
+    <ExerciseLayout title="Squats" image={image} isActive={isExerciseRunning}>
+      {!isExerciseRunning && !name && (
+        <>
+          <ExerciseInput
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <ExerciseButton onClick={() => setName(name)}>
+            Continue
+          </ExerciseButton>
+        </>
+      )}
 
-    {name && (
-      <>
-        <h2>Welcome, {name}!</h2>
+      {name && !difficulty && (
+        <>
+          <h2>Welcome, {name}!</h2>
+          <h3>Select Difficulty:</h3>
+          <ExerciseButton onClick={() => setDifficulty("easy")}>
+            Easy
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("medium")}>
+            Medium
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("hard")}>
+            Hard
+          </ExerciseButton>
+        </>
+      )}
 
-        {!isExerciseRunning && (
-          <>
-            <ExerciseButton
-              onClick={startExercise}
-              disabled={exerciseFinished}
-            >
-              {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
-            </ExerciseButton>
-            <ExerciseButton onClick={() => navigate("/dashboard")}>
-              Back to Menu
-            </ExerciseButton>
-          </>
-        )}
-      </>
-    )}
-  </ExerciseLayout>
+      {difficulty && (
+        <>
+          <h2>
+            Difficulty:{" "}
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </h2>
+
+          {!isExerciseRunning && (
+            <>
+              <ExerciseButton
+                onClick={startExercise}
+                disabled={exerciseFinished}
+              >
+                {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
+              </ExerciseButton>
+              <ExerciseButton onClick={() => navigate("/dashboard")}>
+                Back to Menu
+              </ExerciseButton>
+            </>
+          )}
+        </>
+      )}
+    </ExerciseLayout>
   );
 }

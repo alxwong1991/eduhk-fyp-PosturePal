@@ -54,7 +54,9 @@ export default function BicepCurls() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <ExerciseButton onClick={() => setName(name)}>Continue</ExerciseButton>
+          <ExerciseButton onClick={() => setName(name)}>
+            Continue
+          </ExerciseButton>
         </>
       )}
 
@@ -62,19 +64,31 @@ export default function BicepCurls() {
         <>
           <h2>Welcome, {name}!</h2>
           <h3>Select Difficulty:</h3>
-          <ExerciseButton onClick={() => setDifficulty("easy")}>Easy</ExerciseButton>
-          <ExerciseButton onClick={() => setDifficulty("medium")}>Medium</ExerciseButton>
-          <ExerciseButton onClick={() => setDifficulty("hard")}>Hard</ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("easy")}>
+            Easy
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("medium")}>
+            Medium
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("hard")}>
+            Hard
+          </ExerciseButton>
         </>
       )}
 
       {difficulty && (
         <>
-          <h2>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h2>
+          <h2>
+            Difficulty:{" "}
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </h2>
 
           {!isExerciseRunning && (
             <>
-              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
+              <ExerciseButton
+                onClick={startExercise}
+                disabled={exerciseFinished}
+              >
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>
