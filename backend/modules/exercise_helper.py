@@ -34,9 +34,9 @@ class ExerciseHelper:
         self.exercises = {}
 
     def setup_exercise(self, exercise_name):
-        """✅ Setup any exercise dynamically."""
+        """✅ Ensure Pose detector is properly reset before starting a new exercise."""
         if exercise_name in self.exercises:
-            return  # ✅ Already initialized
+            del self.exercises[exercise_name] # ✅ Delete previous instance to force recreation
 
         exercise_classes = {
             "bicep_curls": BicepCurls,
@@ -47,9 +47,6 @@ class ExerciseHelper:
             raise ValueError(f"Invalid exercise: {exercise_name}")
         
         self.exercises[exercise_name] = exercise_classes[exercise_name]()
-
-        # with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-        #     self.exercises[exercise_name] = exercise_classes[exercise_name](pose)
 
     def set_difficulty(self, exercise_name, difficulty):
         """✅ Set difficulty level for an exercise."""

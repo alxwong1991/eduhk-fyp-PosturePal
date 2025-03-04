@@ -29,7 +29,7 @@ export default function Squats() {
     await showCountdown();
 
     try {
-      await startWebSocketExercise("squats", (totalReps) => {
+      await startWebSocketExercise("squats", difficulty, (totalReps) => {
         setIsExerciseRunning(false);
         showResult(totalReps);
       });

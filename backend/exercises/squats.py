@@ -64,6 +64,7 @@ class Squats:
     def perform_exercise(self, frame, max_reps):
         """Process frame and track squats exercise."""
         if not self.timer_started:
+            self.timer_instance = CountdownTimer(self.timer)
             self.timer_instance.start()
             self.timer_started = True
 
@@ -85,7 +86,8 @@ class Squats:
 
             angle = self.calculate_angle(hip, knee, ankle)
             self.counter = self.update(angle)
-            self.ui_renderer.provide_feedback(angle, image, "squats")
+            
+            self.ui_renderer.provide_feedback(landmarks, image, "squats")
             self.ui_renderer.draw_progress_bar(image, self.counter, max_reps, "squats")
             
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
