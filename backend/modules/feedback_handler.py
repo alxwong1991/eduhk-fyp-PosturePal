@@ -60,8 +60,8 @@ class FeedbackHandler:
             return None, None
         
         # Check arm position when in squat position (angle < 150°)
-        # if squat_angle > 150:
-        #     return None, None
+        if squat_angle > 150:
+            return None, None
 
         left_shoulder = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x,
                          landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].y]

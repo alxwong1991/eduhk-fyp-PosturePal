@@ -113,15 +113,15 @@ export default function Dashboard() {
       available: true,
     },
     {
-      icon: "👊",
-      title: "Push-Ups",
-      path: "/push-ups",
+      icon: "🤸",
+      title: "Jumping Jacks",
+      path: "/jumping-jacks",
       available: false,
     },
     {
-      icon: "🏃‍♂️",
-      title: "Running",
-      path: "/running",
+      icon: "👊",
+      title: "Push-Ups",
+      path: "/push-ups",
       available: false,
     },
   ];

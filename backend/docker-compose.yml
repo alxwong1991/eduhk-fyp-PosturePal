@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:17  # Use the latest stable PostgreSQL version
+    restart: always
+    container_name: posturepal_db
+    environment:
+      POSTGRES_USER: posturepal_user
+      POSTGRES_PASSWORD: securepassword
+      POSTGRES_DB: posturepal
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
