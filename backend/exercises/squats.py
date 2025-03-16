@@ -4,6 +4,7 @@ from mediapipe.python.solutions import drawing_utils as mp_drawing
 from mediapipe.python.solutions import pose as mp_pose
 from modules.countdown_timer import CountdownTimer
 from modules.ui_renderer import UIRenderer
+from modules.feedback_handler import FeedbackHandler
 from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 class Squats:
@@ -14,12 +15,14 @@ class Squats:
         self.pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.max_reps = DIFFICULTY_LEVELS.get("squats", {}).get(DEFAULT_DIFFICULTY, 10)
 
-        # Countdown timer (30 seconds)
-        self.timer = 30
+        # Countdown timer
+        self.timer = 20
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
         self.ui_renderer = UIRenderer()
+        self.feedback_handler = FeedbackHandler()
+        self.feedback_message = ""
 
     def set_difficulty(self, difficulty):
         self.max_reps = DIFFICULTY_LEVELS["squats"].get(difficulty, self.max_reps)
@@ -51,13 +54,20 @@ class Squats:
 
         return image, results.pose_landmarks if results.pose_landmarks else None
 
-    def update(self, angle):
+    def update(self, angle, landmarks, frame):
         """Update the exercise counter based on detected angle."""
-        if angle > 160:
-            self.stage = "up"
-        if angle < 90 and self.stage == "up":
+        arm_message, arm_color, = self.feedback_handler.check_arm_forward_when_down(landmarks, angle, frame)
+
+        if arm_message:
+            self.ui_renderer.display_feedback_message(frame, arm_message, arm_color)
+        # print(f"[INFO] Squat Angle Detected: {angle:.2f}°", end=" - ")
+        if angle > 170:
             self.stage = "down"
+            print("Stand")
+        if angle < 150 and self.stage == "down":
+            self.stage = "up"
             self.counter += 1
+            print("Squat")
 
         return self.counter
 
@@ -85,9 +95,9 @@ class Squats:
                      landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE].y]
 
             angle = self.calculate_angle(hip, knee, ankle)
-            self.counter = self.update(angle)
+            self.counter = self.update(angle, landmarks, frame)
             
-            self.ui_renderer.provide_feedback(landmarks, image, "squats")
+            self.ui_renderer.provide_feedback(landmarks, image, "squats", squat_angle=angle)
             self.ui_renderer.draw_progress_bar(image, self.counter, max_reps, "squats")
             
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)

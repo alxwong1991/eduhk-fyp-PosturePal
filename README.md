@@ -72,6 +72,10 @@ pip install -r requirements.txt
 ```sh
 uvicorn main:app --reload
 ```
+### if your Python from local
+```sh
+python -m uvicorn main:app --reload
+```
 
 ## 📌 Frontend Setup 📌
 

@@ -15,7 +15,7 @@ class BicepCurls:
         self.pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
         self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)  
 
-        # ✅ Countdown timer (30 seconds)
+        # ✅ Countdown timer
         self.timer = 30
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
@@ -55,51 +55,54 @@ class BicepCurls:
 
         return image, results.pose_landmarks if results.pose_landmarks else None
 
-    # def update(self, angle):
-    #     """Update the exercise counter based on detected angle."""
-    #     if angle > 160:
-    #         self.stage = "down"
-    #     if angle < 30 and self.stage == "down":
-    #         self.stage = "up"
-    #         self.counter += 1
-
-    #     return self.counter
-    def update(self, angle, landmarks):
-        """✅ Update exercise counter only if all posture checks pass via FeedbackHandler."""
-        # ✅ Use FeedbackHandler for modular posture checks
-        passed_checks = {
-            "arm": False,
-            # "back": False
-        }
-
-        # # ✅ Check if the back is straight
-        # back_message, _ = self.feedback_handler.check_back_straight(landmarks)
-        # if back_message is None:  # No feedback → Good posture
-        #     passed_checks["back"] = True
-
-        # ✅ Check if the arm is fully extended
+    def update(self, angle, landmarks, frame):
+        """✅ Update exercise counter and display feedback messages."""
+        # ✅ Check arm extension feedback
         arm_message, arm_color = self.feedback_handler.check_arm_extension(landmarks)
-        if arm_message == "Good form! Keep going!":
-            passed_checks["arm"] = True
 
+        print(f"[INFO] Curl Angle Detected: {angle:.2f}°", end=" - ")
         # ✅ Only increment if ALL conditions are met
-        # if angle > 160:
-        #     self.stage = "down"
-        # if angle < 30 and self.stage == "down" and all(passed_checks.values()):
-        #     self.stage = "up"
-        #     self.counter += 1  # ✅ Now counter increments only when posture is correct
-
-        #     self.ui_renderer.display_feedback_message(self.current_frame, arm_message, arm_color)
-
-        # return self.counter
-    
         if angle > 160:
             self.stage = "down"
+            print("Extend")
         if angle < 30 and self.stage == "down":
             self.stage = "up"
-            self.counter += 1  # ✅ Now counter increments only when posture is correct
+            self.counter += 1  # ✅ Increment only when posture is correct
+            print("Curl")
+        # Display feedback message on screen
+        if arm_message:
+            self.ui_renderer.display_feedback_message(frame, arm_message, arm_color)
 
         return self.counter
+
+    # def update(self, angle, landmarks):
+    #     """✅ Update exercise counter only if all posture checks pass via FeedbackHandler."""
+    #     # ✅ Use FeedbackHandler for modular posture checks
+    #     passed_checks = {
+    #         "arm": False,
+    #         "back": False
+    #     }
+
+    #     # # ✅ Check if the back is straight
+    #     back_message, _ = self.feedback_handler.check_back_straight(landmarks)
+    #     if back_message is None:  # No feedback → Good posture
+    #         passed_checks["back"] = True
+
+    #     # ✅ Check if the arm is fully extended
+    #     arm_message, arm_color = self.feedback_handler.check_arm_extension(landmarks)
+    #     if arm_message == "Good form! Keep going!":
+    #         passed_checks["arm"] = True
+
+    #     # ✅ Only increment if ALL conditions are met
+    #     if angle > 160:
+    #         self.stage = "down"
+    #     if angle < 30 and self.stage == "down" and all(passed_checks.values()):
+    #         self.stage = "up"
+    #         self.counter += 1  # ✅ Now counter increments only when posture is correct
+
+    #         self.ui_renderer.display_feedback_message(self.current_frame, arm_message, arm_color)
+
+    #     return self.counter
 
     def perform_exercise(self, frame, max_reps):
         """✅ Process frame and track bicep curls exercise with correct posture check."""
@@ -129,7 +132,7 @@ class BicepCurls:
             angle = self.calculate_angle(shoulder, elbow, wrist)
 
             # ✅ Pass landmarks to update() to ensure correct form before counting
-            self.counter = self.update(angle, landmarks)
+            self.counter = self.update(angle, landmarks, frame)
 
             # ✅ Provide feedback to user
             self.ui_renderer.provide_feedback(landmarks, image, "bicep_curls")
@@ -143,5 +146,11 @@ class BicepCurls:
                 landmark_drawing_spec=mp_drawing.DrawingSpec(color=(245, 117, 66), thickness=2, circle_radius=2),
                 connection_drawing_spec=mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
             )
+
+            # Visualize angle
+            elbow_coords = tuple(np.multiply(elbow, [frame.shape[1], frame.shape[0]]).astype(int))
+            cv2.putText(image, str(angle), elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
+        else:
+            angle = 0
 
         return image, angle, self.counter, False  # ✅ Time is not up yet

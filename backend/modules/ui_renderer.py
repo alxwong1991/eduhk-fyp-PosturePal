@@ -75,23 +75,48 @@ class UIRenderer:
         # cv2.putText(image, label, (bar_x - 80, bar_y_top - 30),
         #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
 
-    def provide_feedback(self, landmarks, image, exercise_name):
+    # def provide_feedback(self, landmarks, image, exercise_name, squat_angle = None):
+    #     """✅ Modular feedback system for multiple exercises."""
+    #     if landmarks is None:
+    #         return # No landmarks detected
+        
+    #     feedback_rules = self.feedback_handler.get_feedback_rules()
+    #     feedback_message, color = "", (255, 255, 255)
+
+    #     # ✅ Run all feedback checks for the exercise
+    #     for check in feedback_rules.get(exercise_name, []):
+    #         message, msg_color = check(landmarks)
+    #         if message:
+    #             feedback_message = message
+    #             color = msg_color
+    #             break  # ✅ Show only one feedback message at a time
+
+    #     if not feedback_message:
+    #         return  # No feedback needed
+
+    #     self.display_feedback_message(image, feedback_message, color)
+
+    def provide_feedback(self, landmarks, image, exercise_name, squat_angle=None):
         """✅ Modular feedback system for multiple exercises."""
         if landmarks is None:
-            return # No landmarks detected
-        
-        feedback_rules = self.feedback_handler.get_feedback_rules()
-        feedback_message, color = "", (255, 255, 255)
+            return  # No landmarks detected
 
-        # ✅ Run all feedback checks for the exercise
-        for check in feedback_rules.get(exercise_name, []):
+        feedback_checks = {
+            "squats": [
+                lambda l: self.feedback_handler.check_arm_forward_when_down(l, squat_angle, image)
+            ],
+            # ✅ Add more feedback functions for other exercises if needed
+        }
+
+        # ✅ Get the list of feedback checks for the given exercise
+        checks = feedback_checks.get(exercise_name, [])
+        feedback_messages = []  # Store multiple feedback messages if needed
+
+        for check in checks:
             message, msg_color = check(landmarks)
             if message:
-                feedback_message = message
-                color = msg_color
-                break  # ✅ Show only one feedback message at a time
+                feedback_messages.append((message, msg_color))
 
-        if not feedback_message:
-            return  # No feedback needed
-
-        self.display_feedback_message(image, feedback_message, color)
+        # ✅ Display feedback messages (supporting multiple messages)
+        for message, color in feedback_messages:
+            self.display_feedback_message(image, message, color)
