@@ -120,33 +120,86 @@ export default function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    gender: "",
+    age: "",
+    dob: "",
+    height_cm: "",
+    weight_kg: "",
     password: "",
     confirmPassword: "",
-    gender: "",
   });
 
-  const validateName = (name) => {
-    if (!name.trim()) return "Please enter your name.";
-    if (/\s/.test(name)) return "Name cannot contain spaces.";
-    if (!/^[a-zA-Z]+$/.test(name))
-      return "Name can only contain alphabetic characters.";
+  // const validateName = (name) => {
+  //   if (!name.trim()) return "Please enter your name.";
+  //   if (/\s/.test(name)) return "Name cannot contain spaces.";
+  //   if (!/^[a-zA-Z]+$/.test(name))
+  //     return "Name can only contain alphabetic characters.";
+  //   return null;
+  // };
+
+
+  // // Validate name
+  // const nameError = validateName(formData.name);
+  // if (nameError) {
+  //   Swal.fire({
+  //     title: "Error",
+  //     text: nameError,
+  //     icon: "error",
+  //     confirmButtonText: "Try Again",
+  //   });
+  //   return;
+  // }
+
+  // // Ensure gender is selected
+  // if (!formData.gender) {
+  //   Swal.fire({
+  //     title: "Error",
+  //     text: "Please select your gender",
+  //     icon: "error",
+  //     confirmButtonText: "OK",
+  //   });
+  //   return;
+  // }
+
+  // ✅ Function to Get Today's Date in YYYY-MM-DD Format
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split("T")[0]; // Formats as YYYY-MM-DD
+  };
+
+  // ✅ Function to Calculate Age from DOB
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--; // Adjust age if the birthdate hasn't occurred yet this year
+    }
+    return age;
+  };
+
+  // ✅ Handle DOB Change and Auto-Calculate Age
+  const handleDobChange = (e) => {
+    const dob = e.target.value;
+    const calculatedAge = calculateAge(dob);
+    setFormData({ ...formData, dob, age: calculatedAge });
+  };
+
+  // ✅ Validate Height & Weight
+  const validateHeightWeight = () => {
+    if (formData.height_cm <= 0 || isNaN(formData.height_cm)) {
+      return "Height must be a positive number greater than 0.";
+    }
+    if (formData.weight_kg <= 0 || isNaN(formData.weight_kg)) {
+      return "Weight must be a positive number greater than 0.";
+    }
     return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate name
-    const nameError = validateName(formData.name);
-    if (nameError) {
-      Swal.fire({
-        title: "Error",
-        text: nameError,
-        icon: "error",
-        confirmButtonText: "Try Again",
-      });
-      return;
-    }
 
     // Validate password match
     if (formData.password !== formData.confirmPassword) {
@@ -159,11 +212,23 @@ export default function Register() {
       return;
     }
 
-    // Ensure gender is selected
-    if (!formData.gender) {
+    // Validate Height & Weight
+    const heightWeightError = validateHeightWeight();
+    if (heightWeightError) {
       Swal.fire({
         title: "Error",
-        text: "Please select your gender",
+        text: heightWeightError,
+        icon: "error",
+        confirmButtonText: "Try Again",
+      });
+      return;
+    }
+
+    // Validate DOB
+    if (!formData.dob) {
+      Swal.fire({
+        title: "Error",
+        text: "Please select your date of birth",
         icon: "error",
         confirmButtonText: "OK",
       });
@@ -174,8 +239,12 @@ export default function Register() {
       await registerUser({
         name: formData.name,
         email: formData.email,
-        password_hash: formData.password,
+        password: formData.password,
         gender: formData.gender,
+        age: formData.age,
+        dob: formData.dob,
+        height_cm: formData.height_cm,
+        weight_kg: formData.weight_kg
       });
 
       Swal.fire({
@@ -223,26 +292,19 @@ export default function Register() {
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-            <option value="Other">Other</option>
           </Select>
-          <Input
-            type="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            required
-          />
-          <Input
-            type="password"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={(e) =>
-              setFormData({ ...formData, confirmPassword: e.target.value })
-            }
-            required
-          />
+          {/* ✅ Date Picker for DOB */}
+          <Input type="date" onChange={handleDobChange} value={formData.dob} max={getTodayDate()} required />
+          {/* ✅ Show calculated age dynamically */}
+          {formData.age && <p>Age: {formData.age} years old</p>}
+          <Input type="number" placeholder="Height (cm)" value={formData.height_cm}
+            onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })} required />
+          <Input type="number" placeholder="Weight (kg)" value={formData.weight_kg}
+            onChange={(e) => setFormData({ ...formData, weight_kg: e.target.value })} required />
+          <Input type="password" placeholder="Password" value={formData.password} 
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+          <Input type="password" placeholder="Confirm Password" value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
           <Button type="submit">Register</Button>
         </Form>
         <LinkText>

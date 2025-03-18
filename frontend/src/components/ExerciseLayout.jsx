@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import PropTypes from "prop-types"; // ✅ Import prop-types for validation
 
 // Main layout for exercise pages
 const ExerciseContainer = styled.div`
