@@ -52,4 +52,4 @@ def login_user(login_data: LoginRequest, session: Session = Depends(get_session)
         logging.error(f"Login failed: Incorrect password for {login_data.email}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    return {"message": "Login successful", "name": user.name}
+    return {"message": "Login successful"}

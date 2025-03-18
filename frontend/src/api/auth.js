@@ -19,30 +19,27 @@ export async function registerUser(userData) {
 // ✅ Login User
 export async function loginUser(credentials) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-        email: credentials.email,
-        password: credentials.password
-    });
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
 
     // ✅ Ensure correct response handling
-    if (!response.data || !response.data.message || !response.data.name) {
+    if (!response.data || !response.data.name) {
         throw new Error("Unexpected response from server");
     }
 
-    const { name } = response.data;
+    const { name, email } = response.data;
 
-    localStorage.setItem("token", response.data.token);
     localStorage.setItem("userName", name);
+    localStorage.setItem("userEmail", email);
 
     return response.data; // Success response
   } catch (error) {
-    console.error("Login error:", error.response?.data || error.message);
     throw new Error(error.response?.data?.detail || "Invalid credentials");
   }
 }
 
 // ✅ Logout User (Clear token & userName)
 export function logoutUser() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
+  localStorage.removeItem("userName");
+  localStorage.removeItem("userEmail")
+  window.dispatchEvent(new Event("storage"));
 }

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Logo from "../components/Logo";
+import NavMenu from "../components/NavMenu";
 
 const Container = styled.div`
   display: flex;
@@ -10,41 +10,7 @@ const Container = styled.div`
   background: linear-gradient(135deg, #1e2a3a 0%, #3d4856 100%);
   color: white;
   padding: 2rem;
-`;
-
-const Header = styled.header`
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-`;
-
-const RightSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-const LogoutButton = styled.button`
-  padding: 8px 16px;
-  border: 2px solid #fff;
-  border-radius: 8px;
-  background: transparent;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
+  padding-top: 100px;
 `;
 
 const ExerciseGrid = styled.div`
@@ -128,13 +94,7 @@ export default function Dashboard() {
 
   return (
     <Container>
-      <Header>
-        <Logo onClick={() => navigate('/dashboard')} />
-        <RightSection>
-          <LogoutButton onClick={() => navigate("/")}>Logout</LogoutButton>
-        </RightSection>
-      </Header>
-      
+      <NavMenu />
       <ExerciseGrid>
         {exercises.map((exercise, index) => (
           <ExerciseCard key={index}>

@@ -6,11 +6,15 @@ import { logoutUser } from "../api/auth";
 
 const NavContainer = styled.nav`
   width: 100%;
+  position: fixed; /* ✅ Make navbar fixed at the top */
+  top: 0;
+  left: 0;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   padding: 1rem 2rem;
-  border-radius: 15px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.3);
+  z-index: 1000;
 `;
 
 const NavContent = styled.div`
@@ -38,7 +42,7 @@ const NavButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
   }
 
@@ -59,21 +63,15 @@ const UserName = styled.span`
   font-weight: 500;
 `;
 
+const Spacer = styled.div`
+  height: 80px; /* ✅ Add space below navbar */
+`;
+
 const NavMenu = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(null);
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || null);
 
-  // ✅ Load userName from localStorage on mount
   useEffect(() => {
-    const storedUserName = localStorage.getItem("userName");
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
-  }, []);
-
-  // ✅ Listen for storage changes to update UI when user logs in/out
-  useEffect(() => {
-    console.log("Initial userName:", localStorage.getItem("userName"));
     const handleStorageChange = () => {
       setUserName(localStorage.getItem("userName") || null);
     };
@@ -89,23 +87,26 @@ const NavMenu = () => {
   };
 
   return (
-    <NavContainer>
-      <NavContent>
-        <Logo onClick={() => navigate("/dashboard")} />
-        <RightSection>
-          {userName ? (
-            <UserInfo>
-              Welcome, <UserName>{userName}</UserName>
-            </UserInfo>
-          ) : (
-            <UserInfo>
-              <UserName>Not Logged In</UserName>
-            </UserInfo>
-          )}
-          <NavButton onClick={handleLogout}>Logout</NavButton>
-        </RightSection>
-      </NavContent>
-    </NavContainer>
+    <>
+      <NavContainer>
+        <NavContent>
+          <Logo onClick={() => navigate("/dashboard")} />
+          <RightSection>
+            {userName ? (
+              <UserInfo>
+                Welcome, <UserName>{userName}</UserName>
+              </UserInfo>
+            ) : (
+              <UserInfo>
+                <UserName>Not Logged In</UserName>
+              </UserInfo>
+            )}
+            <NavButton onClick={handleLogout}>Logout</NavButton>
+          </RightSection>
+        </NavContent>
+      </NavContainer>
+      <Spacer /> {/* ✅ Ensures content doesn't overlap with navbar */}
+    </>
   );
 };
 

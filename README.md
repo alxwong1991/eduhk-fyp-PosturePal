@@ -1,7 +1,7 @@
 # 🚀 PosturePal - AI Exercise Tracker  
 This is my final year project at **EDUHK**. **PosturePal** is an **AI-powered exercise tracking application** that uses **computer vision** to count repetitions and monitor form for exercises like **Bicep Curls** and **Squats** in real-time.  
 
-⚠ **❗ Important:** **MediaPipe does *not* support newer Python versions (e.g., Python 3.11+).**  
+⚠ **❗ Important:** **MediaPipe does *not* support newer Python versions (e.g., Python 3.10+).**  
 👉 It is recommended to use **Python 3.8 - 3.10** for compatibility.
 
 ## ✨ Features
@@ -30,14 +30,7 @@ Before getting started, ensure you have the following installed:
 ### To set up a PostgreSQL database using Docker, run the following command:
 
 ```env
-docker run -d \
-  --name posturepal_db \
-  -e POSTGRES_USER=posturepal_user \
-  -e POSTGRES_PASSWORD=password \
-  -e POSTGRES_DB=posturepal \
-  -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  postgres:15
+docker run -d --name posturepal_db -e POSTGRES_USER=posturepal_user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=posturepal -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres:15
 ```
 
 ### After running the command, check if the container is running:
@@ -155,3 +148,5 @@ alembic downgrade -1
 alembic downgrade base
 alembic upgrade head
 ```
+
+docker run -d --name posturepal_db -e POSTGRES_USER=posturepal_user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=posturepal -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres:15

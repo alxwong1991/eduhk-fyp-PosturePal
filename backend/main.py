@@ -35,7 +35,7 @@ app.add_middleware(
 
 app.include_router(video_router)
 app.include_router(websocket_router)
-app.include_router(auth_router, prefix="/auth")  # ✅ Correctly registered
+app.include_router(auth_router, prefix="/auth")
 
 @app.get("/")
 def home():
