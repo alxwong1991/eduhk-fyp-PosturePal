@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Swal from "sweetalert2";
 import Logo from "../components/Logo";
+import { loginUser } from "../api/auth";
 
 const Container = styled.div`
   display: flex;
@@ -123,12 +124,20 @@ export default function Home() {
 
     // Add your login logic here
     try {
-      // Simulate login success
-      navigate("/dashboard");
+      await loginUser(formData);
+      Swal.fire({
+        title: "Success",
+        text: "Login successful!",
+        icon: "success",
+      }).then(() => {
+        console.log("Dispatching storage event after login...");
+        window.dispatchEvent(new Event("storage"));
+        navigate("/dashboard");
+      });
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Invalid credentials",
+        text: "Invalid credentials: " + error,
         icon: "error",
         confirmButtonText: "Try Again",
       });
@@ -140,6 +149,8 @@ export default function Home() {
       <LogoSection>
         <Logo onClick={() => navigate("/")} large />
       </LogoSection>
+      {/* For debugging */}
+      <Button onClick={() => navigate("/dashboard")}>Debug</Button>
       <FormCard>
         <Title>Welcome Back</Title>
         <Form onSubmit={handleSubmit}>

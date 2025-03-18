@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   db:
-    image: postgres:17  # Use the latest stable PostgreSQL version
+    image: postgres:15
     restart: always
     container_name: posturepal_db
     environment:
       POSTGRES_USER: posturepal_user
-      POSTGRES_PASSWORD: securepassword
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: posturepal
     ports:
       - "5432:5432"

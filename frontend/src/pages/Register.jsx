@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Swal from "sweetalert2";
+import { registerUser } from "../api/auth";
 
 const Container = styled.div`
   display: flex;
@@ -118,13 +119,22 @@ export default function Register() {
 
     try {
       // Add your registration logic here
-      navigate("/");
+      await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password_hash: formData.password
+      })
+      Swal.fire({
+        title: "Success",
+        text: "Account created!",
+        icon: "success"
+      }).then(() => navigate("/"));
+
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "Registration failed",
-        icon: "error",
-        confirmButtonText: "Try Again",
+        text: error.message,
+        icon: "error"
       });
     }
   };

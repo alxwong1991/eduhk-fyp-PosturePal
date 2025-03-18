@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Logo from "./Logo";
+import { logoutUser } from "../api/auth";
 
 const NavContainer = styled.nav`
   width: 100%;
@@ -57,29 +59,50 @@ const UserName = styled.span`
   font-weight: 500;
 `;
 
-const NavMenu = ({ userName, onLogout }) => {
+const NavMenu = () => {
   const navigate = useNavigate();
+  const [userName, setUserName] = useState(null);
+
+  // ✅ Load userName from localStorage on mount
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName");
+    if (storedUserName) {
+      setUserName(storedUserName);
+    }
+  }, []);
+
+  // ✅ Listen for storage changes to update UI when user logs in/out
+  useEffect(() => {
+    console.log("Initial userName:", localStorage.getItem("userName"));
+    const handleStorageChange = () => {
+      setUserName(localStorage.getItem("userName") || null);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
+    logoutUser();
+    setUserName(null);
     navigate("/");
   };
 
   return (
     <NavContainer>
       <NavContent>
-        <Logo onClick={() => navigate('/dashboard')} />
+        <Logo onClick={() => navigate("/dashboard")} />
         <RightSection>
-          {userName && (
+          {userName ? (
             <UserInfo>
               Welcome, <UserName>{userName}</UserName>
             </UserInfo>
+          ) : (
+            <UserInfo>
+              <UserName>Not Logged In</UserName>
+            </UserInfo>
           )}
-          <NavButton onClick={handleLogout}>
-            Logout
-          </NavButton>
+          <NavButton onClick={handleLogout}>Logout</NavButton>
         </RightSection>
       </NavContent>
     </NavContainer>

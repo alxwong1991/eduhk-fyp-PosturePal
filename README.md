@@ -21,8 +21,41 @@ Before getting started, ensure you have the following installed:
 - npm 6.x+
 - A webcam
 - Git
+- Docker *(for database setup)*
 
 # 🛠 Quick Start Guide
+
+## 📌 Database Setup (PostgreSQL in Docker) 📌
+
+### To set up a PostgreSQL database using Docker, run the following command:
+
+```env
+docker run -d \
+  --name posturepal_db \
+  -e POSTGRES_USER=posturepal_user \
+  -e POSTGRES_PASSWORD=password \
+  -e POSTGRES_DB=posturepal \
+  -p 5432:5432 \
+  -v postgres_data:/var/lib/postgresql/data \
+  postgres:15
+```
+
+### After running the command, check if the container is running:
+
+```env
+docker ps
+```
+### To connect to the database inside the running container: (Optional)
+
+```env
+docker exec -it posturepal_db psql -U posturepal_user -d posturepal
+```
+
+### To connect to the database inside the running container: (Optional)
+
+```env
+\dt
+```
 
 ## 📌 Environment Variables Setup 📌
 
@@ -38,12 +71,13 @@ VITE_WEBSOCKET_URL=ws://localhost:8000
 ```env
 API_HOST=0.0.0.0
 API_PORT=8000
+DATABASE_URL=postgresql://posturepal_user:password@localhost:5432/posturepal
 FRONTEND_ORIGINS=http://localhost:5173
 ```
 
 ## 📌 Backend Setup 📌
 
-### 1️⃣ Create and activate a virtual environment
+### Create and activate a virtual environment
 
 ### Windows
 ```sh
@@ -62,13 +96,28 @@ source venv/bin/activate
 source venv/Scripts/activate
 ```
 
-### 2️⃣ Install required dependencies
+### Install required dependencies
 ```sh
 pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Start the backend server
+### Apply migrations
+```sh
+alembic upgrade head
+```
+
+### Create a New Migration (When Making Changes)
+```sh
+alembic revision --autogenerate -m "Added new fields"
+```
+
+### Apply the New Migration
+```sh
+alembic upgrade head
+```
+
+### Start the backend server
 ```sh
 uvicorn main:app --reload
 ```
@@ -79,12 +128,30 @@ python -m uvicorn main:app --reload
 
 ## 📌 Frontend Setup 📌
 
-### 1️⃣ Install dependencies
+### Install dependencies
 ```sh
 npm install
 ```
 
-### 2️⃣ Start the frontend development server
+### Start the frontend development server
 ```sh
 npm run dev
+```
+
+## 📌 Additional Backend Commands 📌
+
+### Check Database Tables
+```sh
+alembic current
+```
+
+### Rollback Last Migration
+```sh
+alembic downgrade -1
+```
+
+### Reset Database (⚠ Warning: Deletes Data)
+```sh
+alembic downgrade base
+alembic upgrade head
 ```
