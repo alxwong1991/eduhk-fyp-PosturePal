@@ -58,6 +58,26 @@ const Input = styled.input`
   }
 `;
 
+const Select = styled.select`
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+
+  &:focus {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+  }
+
+  option {
+    color: black;
+  }
+`;
+
 const Button = styled.button`
   padding: 12px;
   border: none;
@@ -102,11 +122,33 @@ export default function Register() {
     email: "",
     password: "",
     confirmPassword: "",
+    gender: "",
   });
+
+  const validateName = (name) => {
+    if (!name.trim()) return "Please enter your name.";
+    if (/\s/.test(name)) return "Name cannot contain spaces.";
+    if (!/^[a-zA-Z]+$/.test(name))
+      return "Name can only contain alphabetic characters.";
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate name
+    const nameError = validateName(formData.name);
+    if (nameError) {
+      Swal.fire({
+        title: "Error",
+        text: nameError,
+        icon: "error",
+        confirmButtonText: "Try Again",
+      });
+      return;
+    }
+
+    // Validate password match
     if (formData.password !== formData.confirmPassword) {
       Swal.fire({
         title: "Error",
@@ -117,24 +159,35 @@ export default function Register() {
       return;
     }
 
+    // Ensure gender is selected
+    if (!formData.gender) {
+      Swal.fire({
+        title: "Error",
+        text: "Please select your gender",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     try {
-      // Add your registration logic here
       await registerUser({
         name: formData.name,
         email: formData.email,
-        password_hash: formData.password
-      })
+        password_hash: formData.password,
+        gender: formData.gender,
+      });
+
       Swal.fire({
         title: "Success",
         text: "Account created!",
-        icon: "success"
+        icon: "success",
       }).then(() => navigate("/"));
-
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: error.message,
-        icon: "error"
+        text: error.response?.data?.detail || "Registration failed",
+        icon: "error",
       });
     }
   };
@@ -160,6 +213,18 @@ export default function Register() {
             }
             required
           />
+          <Select
+            value={formData.gender}
+            onChange={(e) =>
+              setFormData({ ...formData, gender: e.target.value })
+            }
+            required
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </Select>
           <Input
             type="password"
             placeholder="Password"

@@ -30,7 +30,7 @@ Before getting started, ensure you have the following installed:
 ### To set up a PostgreSQL database using Docker, run the following command:
 
 ```env
-docker run -d --name posturepal_db -e POSTGRES_USER=posturepal_user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=posturepal -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres:15
+docker-compose up -d
 ```
 
 ### After running the command, check if the container is running:
@@ -38,16 +38,18 @@ docker run -d --name posturepal_db -e POSTGRES_USER=posturepal_user -e POSTGRES_
 ```env
 docker ps
 ```
-### To connect to the database inside the running container: (Optional)
+
+### Stop and Remove the Database (Cleanup)
 
 ```env
-docker exec -it posturepal_db psql -U posturepal_user -d posturepal
+docker-compose down -v
 ```
 
-### To connect to the database inside the running container: (Optional)
+#### ⚠ Warning: This removes the database and all stored data!
+#### If you want to keep the data, use:
 
 ```env
-\dt
+docker-compose down
 ```
 
 ## 📌 Environment Variables Setup 📌
@@ -91,21 +93,10 @@ source venv/Scripts/activate
 
 ### Install required dependencies
 ```sh
-pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
-### Apply migrations
-```sh
-alembic upgrade head
-```
-
-### Create a New Migration (When Making Changes)
-```sh
-alembic revision --autogenerate -m "Added new fields"
-```
-
-### Apply the New Migration
+### Apply Database Migrations
 ```sh
 alembic upgrade head
 ```
@@ -114,24 +105,22 @@ alembic upgrade head
 ```sh
 uvicorn main:app --reload
 ```
-### if your Python from local
+### If using system-installed Python
 ```sh
 python -m uvicorn main:app --reload
 ```
 
-## 📌 Frontend Setup 📌
+## 📌 Additional Backend Commands (Optional) 📌
 
-### Install dependencies
+### After installing new packages, update requirements.txt:
 ```sh
-npm install
+pip freeze > requirements.txt
 ```
 
-### Start the frontend development server
+### Create a New Migration (When Making Changes)
 ```sh
-npm run dev
+alembic revision --autogenerate -m "Added new fields"
 ```
-
-## 📌 Additional Backend Commands 📌
 
 ### Check Database Tables
 ```sh
@@ -149,4 +138,14 @@ alembic downgrade base
 alembic upgrade head
 ```
 
-docker run -d --name posturepal_db -e POSTGRES_USER=posturepal_user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=posturepal -p 5432:5432 -v postgres_data:/var/lib/postgresql/data postgres:15
+## 📌 Frontend Setup 📌
+
+### Install dependencies
+```sh
+npm install
+```
+
+### Start the frontend development server
+```sh
+npm run dev
+```

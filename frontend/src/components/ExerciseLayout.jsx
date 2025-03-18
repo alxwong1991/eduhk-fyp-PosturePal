@@ -135,18 +135,4 @@ const ExerciseLayout = ({ title, children, image, isActive }) => {
   );
 };
 
-// ✅ Add PropTypes Validation
-ExerciseLayout.propTypes = {
-  title: PropTypes.string.isRequired, // Ensures title is a required string
-  children: PropTypes.node.isRequired, // Ensures children is a valid React node
-  image: PropTypes.string, // Ensures image is a string (Base64 or URL)
-  isActive: PropTypes.bool, // Ensures isActive is a boolean
-};
-
-// ✅ Default Props (Optional)
-ExerciseLayout.defaultProps = {
-  image: "", // Default to empty image
-  isActive: false, // Default isActive to false
-};
-
 export { ExerciseLayout, ExerciseInput, ExerciseButton };

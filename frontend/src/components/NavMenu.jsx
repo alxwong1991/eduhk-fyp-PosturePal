@@ -94,7 +94,7 @@ const NavMenu = () => {
           <RightSection>
             {userName ? (
               <UserInfo>
-                Welcome, <UserName>{userName}</UserName>
+                Hello, <UserName>{userName}</UserName>
               </UserInfo>
             ) : (
               <UserInfo>
