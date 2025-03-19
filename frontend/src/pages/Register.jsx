@@ -151,7 +151,7 @@ export default function Register() {
         title: "Success",
         text: "Account created!",
         icon: "success",
-      }).then(() => navigate("/"));
+      }).then(() => navigate("/login"));
     } catch (error) {
       Swal.fire({
         title: "Error",
@@ -247,7 +247,7 @@ export default function Register() {
             href="/"
             onClick={(e) => {
               e.preventDefault();
-              navigate("/");
+              navigate("/login");
             }}
           >
             Login

@@ -1,5 +1,4 @@
 import axios from "axios";
-import Swal from "sweetalert2";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -17,20 +16,12 @@ export async function registerUser(userData) {
   }
 }
 
-// ✅ Login User
+// ✅ Login User (Uses Cookies)
 export async function loginUser(credentials) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
-
-    // ✅ Ensure correct response handling
-    if (!response.data || !response.data.name) {
-        throw new Error("Unexpected response from server");
-    }
-
-    const { name, email } = response.data;
-
-    localStorage.setItem("userName", name);
-    localStorage.setItem("userEmail", email);
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials, {
+      withCredentials: true, // ✅ Enables session cookies
+    });
 
     return response.data; // Success response
   } catch (error) {
@@ -38,18 +29,26 @@ export async function loginUser(credentials) {
   }
 }
 
-// ✅ Logout User (Clear token & userName)
-export function logoutUser() {
-  localStorage.removeItem("userName");
-  localStorage.removeItem("userEmail")
-  window.dispatchEvent(new Event("storage"));
+// ✅ Fetch Logged-in User Profile
+export async function getUserProfile() {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
+      withCredentials: true, // ✅ Ensures cookies are sent for authentication
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.detail || "Failed to fetch profile");
+  }
+}
 
-  Swal.fire({
-    title: "Logged Out",
-    text: "You have been successfully logged out.",
-    icon: "info",
-    confirmButtonText: "OK"
-  }).then(() => {
-    window.dispatchEvent(new Event("storage"));
-  });
+// ✅ Logout User (Clear Session)
+export async function logoutUser() {
+  try {
+    await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
+    
+    // ✅ Force reload to clear session cookie
+    window.location.href = "/login";  
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
 }

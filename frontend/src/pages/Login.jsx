@@ -3,9 +3,18 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Logo from "../components/Logo";
 import { loginUser } from "../api/auth";
-import { Container, FormCard, Title, Form, Input, Button, LinkText, LogoSection } from "../styles/pages/LoginStyles";
+import { 
+  Container, 
+  FormCard, 
+  Title, 
+  Form, 
+  Input, 
+  Button, 
+  LinkText, 
+  LogoSection 
+} from "../styles/pages/LoginStyles";
 
-export default function Home() {
+export default function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -15,7 +24,6 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Add your login logic here
     try {
       await loginUser(formData);
       Swal.fire({
@@ -42,8 +50,7 @@ export default function Home() {
       <LogoSection>
         <Logo onClick={() => navigate("/")} large />
       </LogoSection>
-      {/* For debugging */}
-      <Button onClick={() => navigate("/dashboard")}>Debug</Button>
+      
       <FormCard>
         <Title>Welcome Back</Title>
         <Form onSubmit={handleSubmit}>
@@ -66,7 +73,16 @@ export default function Home() {
             required
           />
           <Button type="submit">Login</Button>
+          
+          <Button 
+            type="button" 
+            onClick={() => navigate("/dashboard")}
+            style={{ backgroundColor: "#666", marginTop: "10px" }}
+          >
+            Return to Dashboard
+          </Button>
         </Form>
+
         <LinkText>
           Don't have an account?
           <a

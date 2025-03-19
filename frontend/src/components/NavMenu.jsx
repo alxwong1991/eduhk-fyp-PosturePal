@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import Logo from "./Logo";
 import { logoutUser } from "../api/auth";
 import {
@@ -14,9 +15,7 @@ import {
 
 const NavMenu = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(
-    localStorage.getItem("userName") || null
-  );
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || null);
 
   useEffect(() => {
     const handleStorageChange = () => {
@@ -30,7 +29,14 @@ const NavMenu = () => {
   const handleLogout = () => {
     logoutUser();
     setUserName(null);
-    navigate("/");
+    navigate("/dashboard");
+
+    Swal.fire({
+      title: "Logged Out",
+      text: "You have been successfully logged out.",
+      icon: "info",
+      confirmButtonText: "OK",
+    });
   };
 
   return (
@@ -40,19 +46,25 @@ const NavMenu = () => {
           <Logo onClick={() => navigate("/dashboard")} />
           <RightSection>
             {userName ? (
-              <UserInfo>
-                Hello, <UserName>{userName}</UserName>
-              </UserInfo>
+              <>
+                <UserInfo>
+                  Hello, <UserName>{userName}</UserName>
+                </UserInfo>
+                <NavButton onClick={() => navigate("/profile")}>Profile</NavButton>
+                <NavButton onClick={handleLogout}>Logout</NavButton>
+              </>
             ) : (
-              <UserInfo>
-                <UserName>Not Logged In</UserName>
-              </UserInfo>
+              <>
+                <UserInfo>
+                  <UserName>Not Logged In</UserName>
+                </UserInfo>
+                <NavButton onClick={() => navigate("/login")}>Login</NavButton>
+              </>
             )}
-            <NavButton onClick={handleLogout}>Logout</NavButton>
           </RightSection>
         </NavContent>
       </NavContainer>
-      <Spacer /> {/* ✅ Ensures content doesn't overlap with navbar */}
+      <Spacer />
     </>
   );
 };
