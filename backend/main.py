@@ -3,12 +3,11 @@ from fastapi import FastAPI, Depends
 from sqlmodel import Session
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
-from routes.video import video_router
-from routes.websocket import websocket_router
+from routes import router
 from dotenv import load_dotenv
 from database import get_session
 from contextlib import asynccontextmanager
-from routes.auth import auth_router
+
 
 load_dotenv(override=True)
 
@@ -33,9 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(video_router)
-app.include_router(websocket_router)
-app.include_router(auth_router, prefix="/auth")
+app.include_router(router)
 
 @app.get("/")
 def home():
