@@ -3,6 +3,7 @@ from typing import Optional, List
 from pydantic import EmailStr
 import bcrypt
 from datetime import date, datetime
+from models.exercise_log import ExerciseLog
 
 class User(SQLModel, table=True):
     """✅ User model with relationship to ExerciseLog."""
@@ -31,6 +32,3 @@ class User(SQLModel, table=True):
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-
-# ✅ Import here to avoid circular import
-from models.exercise_log import ExerciseLog

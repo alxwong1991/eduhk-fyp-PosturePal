@@ -1,4 +1,5 @@
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -42,4 +43,13 @@ export function logoutUser() {
   localStorage.removeItem("userName");
   localStorage.removeItem("userEmail")
   window.dispatchEvent(new Event("storage"));
+
+  Swal.fire({
+    title: "Logged Out",
+    text: "You have been successfully logged out.",
+    icon: "info",
+    confirmButtonText: "OK"
+  }).then(() => {
+    window.dispatchEvent(new Event("storage"));
+  });
 }

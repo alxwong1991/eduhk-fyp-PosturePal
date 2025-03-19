@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from database import get_session
-from models.exercise import ExerciseLog
+from models.exercise_log import ExerciseLog
 from models.user import User
-from schemas.exercise import ExerciseCreate, ExerciseResponse
+from schemas.exercise_log import ExerciseCreate, ExerciseResponse
 from datetime import datetime
 
 exercise_router = APIRouter()
@@ -21,7 +21,7 @@ def log_exercise(exercise_data: ExerciseCreate, session: Session = Depends(get_s
         exercise_name=exercise_data.exercise_name,
         calories_burned=exercise_data.calories_burned,
         duration_minutes=exercise_data.duration_minutes,
-        exercise_date=datetime.utcnow(),
+        exercise_date=datetime.now(datetime.timezone.utc),
     )
 
     # ✅ Update daily calories burned

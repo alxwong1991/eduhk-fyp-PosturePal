@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from database import get_session
 from contextlib import asynccontextmanager
 from routes.auth import auth_router
-from routes.exercise_log import exercise_log_router
+from routes.exercise_log import exercise_router
 
 
 load_dotenv(override=True)
@@ -38,7 +38,7 @@ app.add_middleware(
 app.include_router(video_router)
 app.include_router(websocket_router)
 app.include_router(auth_router, prefix="/auth")
-app.include_router(exercise_log_router, prefix="/exercise", tags=["Exercise"])
+app.include_router(exercise_router, prefix="/exercise", tags=["Exercise"])
 
 @app.get("/")
 def home():
