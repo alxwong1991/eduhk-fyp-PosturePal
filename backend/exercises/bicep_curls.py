@@ -13,16 +13,16 @@ class BicepCurls:
         self.counter = 0
         self.stage = None
         self.pose = mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5)
-        self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)  
+        self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)
 
-        # ✅ Countdown timer
+        # ✅ Timer setup
         self.timer = 30
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
         self.ui_renderer = UIRenderer()
         self.feedback_handler = FeedbackHandler()
-        self.feedback_message = ""  # ✅ Stores feedback message
+        self.feedback_message = "Start Exercise!"  # ✅ Default message
 
     def set_difficulty(self, difficulty):
         """✅ Dynamically update max reps based on difficulty."""
@@ -55,26 +55,6 @@ class BicepCurls:
 
         return image, results.pose_landmarks if results.pose_landmarks else None
 
-    def update(self, angle, landmarks, frame):
-        """✅ Update exercise counter and display feedback messages."""
-        # ✅ Check arm extension feedback
-        arm_message, arm_color = self.feedback_handler.check_arm_extension(landmarks)
-
-        print(f"[INFO] Curl Angle Detected: {angle:.2f}°", end=" - ")
-        # ✅ Only increment if ALL conditions are met
-        if angle > 160:
-            self.stage = "down"
-            print("Extend")
-        if angle < 30 and self.stage == "down":
-            self.stage = "up"
-            self.counter += 1  # ✅ Increment only when posture is correct
-            print("Curl")
-        # Display feedback message on screen
-        if arm_message:
-            self.ui_renderer.display_feedback_message(frame, arm_message, arm_color)
-
-        return self.counter
-
     # def update(self, angle, landmarks):
     #     """✅ Update exercise counter only if all posture checks pass via FeedbackHandler."""
     #     # ✅ Use FeedbackHandler for modular posture checks
@@ -104,6 +84,27 @@ class BicepCurls:
 
     #     return self.counter
 
+    def update(self, angle, landmarks):
+        """✅ Update exercise counter and display feedback messages."""
+        if landmarks:
+            # ✅ Get feedback message
+            arm_message, arm_color = self.feedback_handler.check_arm_extension(landmarks)
+
+            if arm_message:
+                self.feedback_message = arm_message  # ✅ Store latest feedback message
+
+            print(f"[INFO] Curl Angle Detected: {angle:.2f}°", end=" - ")
+
+            if angle > 160:
+                self.stage = "down"
+                print("Extend")
+            if angle < 30 and self.stage == "down":
+                self.stage = "up"
+                self.counter += 1  # ✅ Increment only when posture is correct
+                print("Curl")
+
+        return self.counter, arm_message, arm_color
+
     def perform_exercise(self, frame, max_reps):
         """✅ Process frame and track bicep curls exercise with correct posture check."""
         if not self.timer_started:
@@ -118,8 +119,9 @@ class BicepCurls:
 
         image, landmarks = self.detect(frame)
 
-        # ✅ Ensure angle is always initialized
-        angle = 0  
+        # # ✅ Ensure angle is always initialized
+        # angle = 0  
+        # arm_message, arm_color = None, (255, 255, 255)  # ✅ Default color
 
         if landmarks:
             shoulder = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x, 
@@ -132,11 +134,14 @@ class BicepCurls:
             angle = self.calculate_angle(shoulder, elbow, wrist)
 
             # ✅ Pass landmarks to update() to ensure correct form before counting
-            self.counter = self.update(angle, landmarks, frame)
+            self.counter, arm_color = self.update(angle, landmarks)
 
             # ✅ Provide feedback to user
             self.ui_renderer.provide_feedback(landmarks, image, "bicep_curls")
             self.ui_renderer.draw_progress_bar(image, self.counter, max_reps, "bicep_curls")
+
+            # ✅ Ensure feedback message is displayed **AFTER** all drawings
+            self.ui_renderer.display_feedback_message(image, self.feedback_message, arm_color)
 
             image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
 
@@ -147,10 +152,9 @@ class BicepCurls:
                 connection_drawing_spec=mp_drawing.DrawingSpec(color=(245, 66, 230), thickness=2, circle_radius=2)
             )
 
-            # Visualize angle
+            # ✅ Visualize angle at elbow position
             elbow_coords = tuple(np.multiply(elbow, [frame.shape[1], frame.shape[0]]).astype(int))
-            cv2.putText(image, str(angle), elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
-        else:
-            angle = 0
+            elbow_coords = (max(elbow_coords[0] - 20, 0), max(elbow_coords[1] - 10, 0))  # ✅ Adjust for better visibility
+            cv2.putText(image, f"{int(angle)}°", elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         return image, angle, self.counter, False  # ✅ Time is not up yet

@@ -49,8 +49,10 @@ class FeedbackHandler:
         arm_angle = self.calculate_angle(left_shoulder, left_elbow, left_wrist)
         
         if arm_angle > 160:
+            print("yes")
             return "Good form! Keep going!", (0, 255, 0)
         else:
+            print("no")
             return "Extend your arm!", (0, 0, 255)
     
     # Squats

@@ -1,18 +1,15 @@
 import asyncio
 import base64
 import cv2
-from fastapi import APIRouter, WebSocket, Query
+from fastapi import APIRouter, WebSocket, HTTPException
 from modules.camera import Camera
 from modules.exercise_helper import ExerciseHelper
-from fastapi import HTTPException
 from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 websocket_router = APIRouter()
-camera = Camera()
-exercise_helper = ExerciseHelper()
 
-# ✅ Check Camera
-@websocket_router.get("/check_camera")
+# ✅ Check Camera Endpoint
+@websocket_router.get("/system/check_camera")
 async def check_camera():
     """Check if camera is available and working."""
     try:
@@ -25,58 +22,70 @@ async def check_camera():
             raise HTTPException(status_code=400, detail="Camera not working")
             
         return {"status": "ok", "message": "Camera is working"}
-    except Exception:
-        raise HTTPException(status_code=400, detail="Failed to access camera")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to access camera: {str(e)}")
 
 
-# ✅ Dynamic WebSocket for Any Exercise
-@websocket_router.websocket("/ws/start_exercise")
-async def start_exercise(websocket: WebSocket, exercise: str, difficulty: str = Query(DEFAULT_DIFFICULTY)):
-    """✅ Handles all exercises dynamically."""
+# ✅ WebSocket for Exercise Tracking
+@websocket_router.websocket("/start_exercise")
+async def start_exercise(websocket: WebSocket):
+    """Handles exercise tracking with WebSockets."""
     await websocket.accept()
-    camera.start_capture()
+
+    camera = Camera()  # ✅ Ensure camera is initialized inside the function
+    exercise_helper = ExerciseHelper()
 
     try:
-        exercise_helper.setup_exercise(exercise)  # ✅ Setup dynamically
-        exercise_helper.set_difficulty(exercise, difficulty)  # ✅ Set difficulty
-    except ValueError as e:
-        await websocket.send_json({"error": str(e)})
-        await websocket.close()
-        return
+        camera.start_capture()  # ✅ Start capturing video
 
-    max_reps = DIFFICULTY_LEVELS.get(exercise, {}).get(difficulty, 10)  # ✅ Get reps dynamically
+        # ✅ Extract parameters from WebSocket query string
+        query_params = websocket.query_params
+        exercise = query_params.get("exercise")
+        difficulty = query_params.get("difficulty", DEFAULT_DIFFICULTY)
 
-    for i in range(5, 0, -1):
-        await websocket.send_json({"event": "display_countdown", "countdown": i})
-        await asyncio.sleep(1)
+        if not exercise:
+            await websocket.send_json({"error": "Missing 'exercise' parameter"})
+            return
 
-    while camera.cap.isOpened():
-        ret, frame = camera.read_frame()
-        if not ret:
-            break
+        exercise_helper.setup_exercise(exercise)
+        exercise_helper.set_difficulty(exercise, difficulty)
 
-        frame, angle, counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
+        max_reps = DIFFICULTY_LEVELS.get(exercise, {}).get(difficulty, 10)
 
-        _, buffer = cv2.imencode(".jpg", frame)
-        base64_frame = base64.b64encode(buffer).decode("utf-8")
+        for i in range(5, 0, -1):
+            await websocket.send_json({"event": "display_countdown", "countdown": i})
+            await asyncio.sleep(1)
+
+        counter = 0
+        while camera.cap.isOpened():
+            ret, frame = camera.read_frame()
+            if not ret:
+                break
+
+            frame, angle, counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
+
+            _, buffer = cv2.imencode(".jpg", frame)
+            base64_frame = base64.b64encode(buffer).decode("utf-8")
+
+            await websocket.send_json({
+                "event": "update_frame",
+                "image": base64_frame,
+                "counter": counter
+            })
+
+            if counter >= max_reps or time_up:
+                break  
+
+            await asyncio.sleep(0.1)
 
         await websocket.send_json({
-            "event": "update_frame",
-            "image": base64_frame,
-            "counter": counter
+            "event": "exercise_complete",
+            "message": f"Exercise complete! Total reps: {counter}",
+            "total_reps": counter
         })
 
-        if counter >= max_reps or time_up:
-            break  
-
-        await asyncio.sleep(0.1)
-
-    camera.release_capture()
-
-    await websocket.send_json({
-        "event": "exercise_complete",
-        "message": f"Exercise complete! Total reps: {counter}",
-        "total_reps": counter
-    })
-
-    await websocket.close()
+    except Exception as e:
+        print(f"WebSocket Error: {e}")
+    finally:
+        camera.release_capture()  # ✅ Ensure the camera is always released
+        await websocket.close()

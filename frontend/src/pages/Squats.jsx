@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import { showResult } from "../components/ShowResult";
 import { showCameraError } from "../components/ShowCameraError";
-import { useExerciseWebSocket } from "../hooks/useExerciseWebSocket";
+import { useWebSocket } from "../hooks/useWebSocket";
 import {
   ExerciseLayout,
   ExerciseInput,
   ExerciseButton,
 } from "../components/ExerciseLayout";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
 export default function Squats() {
   const [name, setName] = useState("");
@@ -19,8 +16,7 @@ export default function Squats() {
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
-  const { image, exerciseFinished, startWebSocketExercise } =
-    useExerciseWebSocket(API_BASE_URL, WEBSOCKET_URL);
+  const { image, exerciseFinished, startWebSocketExercise } = useWebSocket();
 
   async function startExercise() {
     if (!difficulty) return; // Ensure difficulty is selected
@@ -41,7 +37,7 @@ export default function Squats() {
   }
 
   return (
-    <ExerciseLayout title="Squats" image={image} isActive={isExerciseRunning}>
+    <ExerciseLayout title="Squats" image={image} isActive={!exerciseFinished && isExerciseRunning}>
       {!isExerciseRunning && !name && (
         <>
           <ExerciseInput

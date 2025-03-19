@@ -1,119 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import Swal from "sweetalert2";
 import { registerUser } from "../api/auth";
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #1e2a3a 0%, #3d4856 100%);
-  color: white;
-`;
-
-const FormCard = styled.div`
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2rem;
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  width: 100%;
-  max-width: 400px;
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  text-align: center;
-  color: #fff;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-const Input = styled.input`
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
-  color: white;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s ease;
-
-  &:focus {
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-  }
-`;
-
-const Select = styled.select`
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.07);
-  color: white;
-  font-size: 1rem;
-  outline: none;
-  transition: all 0.3s ease;
-
-  &:focus {
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
-  }
-
-  option {
-    color: black;
-  }
-`;
-
-const Button = styled.button`
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: #4a90e2;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: #357abd;
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const LinkText = styled.p`
-  text-align: center;
-  margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.7);
-
-  a {
-    color: #4a90e2;
-    text-decoration: none;
-    font-weight: bold;
-    margin-left: 0.5rem;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
+import {
+  Container,
+  Form,
+  FormCard,
+  Title,
+  Input,
+  Select,
+  Button,
+  LinkText,
+} from "../styles/pages/RegisterStyles";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -136,7 +34,6 @@ export default function Register() {
   //     return "Name can only contain alphabetic characters.";
   //   return null;
   // };
-
 
   // // Validate name
   // const nameError = validateName(formData.name);
@@ -174,7 +71,10 @@ export default function Register() {
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
 
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--; // Adjust age if the birthdate hasn't occurred yet this year
     }
     return age;
@@ -244,7 +144,7 @@ export default function Register() {
         age: formData.age,
         dob: formData.dob,
         height_cm: formData.height_cm,
-        weight_kg: formData.weight_kg
+        weight_kg: formData.weight_kg,
       });
 
       Swal.fire({
@@ -294,17 +194,51 @@ export default function Register() {
             <option value="Female">Female</option>
           </Select>
           {/* ✅ Date Picker for DOB */}
-          <Input type="date" onChange={handleDobChange} value={formData.dob} max={getTodayDate()} required />
+          <Input
+            type="date"
+            onChange={handleDobChange}
+            value={formData.dob}
+            max={getTodayDate()}
+            required
+          />
           {/* ✅ Show calculated age dynamically */}
           {formData.age && <p>Age: {formData.age} years old</p>}
-          <Input type="number" placeholder="Height (cm)" value={formData.height_cm}
-            onChange={(e) => setFormData({ ...formData, height_cm: e.target.value })} required />
-          <Input type="number" placeholder="Weight (kg)" value={formData.weight_kg}
-            onChange={(e) => setFormData({ ...formData, weight_kg: e.target.value })} required />
-          <Input type="password" placeholder="Password" value={formData.password} 
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
-          <Input type="password" placeholder="Confirm Password" value={formData.confirmPassword}
-            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} required />
+          <Input
+            type="number"
+            placeholder="Height (cm)"
+            value={formData.height_cm}
+            onChange={(e) =>
+              setFormData({ ...formData, height_cm: e.target.value })
+            }
+            required
+          />
+          <Input
+            type="number"
+            placeholder="Weight (kg)"
+            value={formData.weight_kg}
+            onChange={(e) =>
+              setFormData({ ...formData, weight_kg: e.target.value })
+            }
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+            required
+          />
+          <Input
+            type="password"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={(e) =>
+              setFormData({ ...formData, confirmPassword: e.target.value })
+            }
+            required
+          />
           <Button type="submit">Register</Button>
         </Form>
         <LinkText>
