@@ -10,7 +10,7 @@ import re
 auth_router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-# Email validation regex
+# ✅ Email validation regex
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 @auth_router.post("/register")
@@ -54,9 +54,10 @@ def login_user(login_data: LoginRequest, session: Session = Depends(get_session)
 
 def get_current_user(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session)):
     """✅ Get current logged-in user from JWT token."""
-    payload = verify_access_token(token)
-    if not payload:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    try:
+        payload = verify_access_token(token)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
 
     user = session.exec(select(User).where(User.email == payload["email"])).first()
     if not user:

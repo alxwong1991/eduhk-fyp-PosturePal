@@ -1,29 +1,18 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getUserProfile } from "../api/auth"; 
+import { useAuth } from "../hooks/useAuth";
 import NavMenu from "../components/NavMenu";
-import { Container, ProfileCard, ProfileImage, Info, Label, Value, Section, Placeholder } from "../styles/pages/ProfileStyles";
+import {
+  Container,
+  ProfileCard,
+  ProfileImage,
+  Info,
+  Label,
+  Value,
+  Section,
+  Placeholder,
+} from "../styles/pages/ProfileStyles";
 
 export default function Profile() {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userData = await getUserProfile();
-        setUser(userData);
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        navigate("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [navigate]);
+  const { user, loading } = useAuth();
 
   if (loading) {
     return <Container>Loading profile...</Container>;
@@ -48,7 +37,7 @@ export default function Profile() {
             <Label>Email:</Label> <Value>{user.email}</Value>
           </Info>
           <Info>
-            <Label>Age:</Label> <Value>{user.age} years</Value>  {/* ✅ Age now correctly fetched */}
+            <Label>Age:</Label> <Value>{user.age} years</Value>
           </Info>
           <Info>
             <Label>Gender:</Label> <Value>{user.gender}</Value>

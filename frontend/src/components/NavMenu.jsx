@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import Logo from "./Logo";
-import { logoutUser } from "../api/auth";
+import { useAuth } from "../hooks/useAuth"; // ✅ Import useAuth
 import {
   NavContainer,
   NavContent,
@@ -15,21 +15,27 @@ import {
 
 const NavMenu = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(localStorage.getItem("userName") || null);
+  const location = useLocation();
+  const { user, logout } = useAuth(); // ✅ Get user & logout function from useAuth
 
+  // ✅ Show "Session Expired" alert when user becomes null
   useEffect(() => {
-    const handleStorageChange = () => {
-      setUserName(localStorage.getItem("userName") || null);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+    if (user === null) {
+      Swal.fire({
+        title: "Session Expired",
+        text: "Your session has expired. Please log in again.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then(() => {
+        navigate("/login"); // ✅ Redirect to login
+      });
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
-    logoutUser();
-    setUserName(null);
-    navigate("/dashboard");
+    logout(); // ✅ Calls logout function from useAuth
 
     Swal.fire({
       title: "Logged Out",
@@ -37,6 +43,8 @@ const NavMenu = () => {
       icon: "info",
       confirmButtonText: "OK",
     });
+
+    navigate("/dashboard");
   };
 
   return (
@@ -45,12 +53,14 @@ const NavMenu = () => {
         <NavContent>
           <Logo onClick={() => navigate("/dashboard")} />
           <RightSection>
-            {userName ? (
+            {user ? (
               <>
                 <UserInfo>
-                  Hello, <UserName>{userName}</UserName>
+                  Hello, <UserName>{user.name}</UserName>
                 </UserInfo>
-                <NavButton onClick={() => navigate("/profile")}>Profile</NavButton>
+                {location.pathname !== "/profile" && (
+                  <NavButton onClick={() => navigate("/profile")}>Profile</NavButton>
+                )}
                 <NavButton onClick={handleLogout}>Logout</NavButton>
               </>
             ) : (
