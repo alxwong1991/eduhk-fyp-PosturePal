@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // ✅ Decode JWT token
+import { jwtDecode } from "jwt-decode";
 import { registerUser, loginUser, getUserProfile, logoutUser } from "../api/auth";
+import { useWebsocket } from "../hooks/useWebsocket";
 
 export function useAuth() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [sessionHandled, setSessionHandled] = useState(false); // ✅ Prevent repeat alerts
   const navigate = useNavigate();
+  const { isExerciseRunning } = useWebsocket();
 
-  // ✅ Function to check if token is expired
   const checkSessionExpiration = () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;
@@ -18,7 +21,7 @@ export function useAuth() {
       const currentTime = Math.floor(Date.now() / 1000);
 
       if (decoded.exp < currentTime) {
-        console.warn("Session expired detected via JWT decoding.");
+        console.warn("Session expired detected.");
         handleSessionExpired();
       }
     } catch (error) {
@@ -26,23 +29,31 @@ export function useAuth() {
     }
   };
 
-  // ✅ Handle session expiration
   const handleSessionExpired = () => {
-    logoutUser();
-    setUser(null); // ✅ This will trigger the alert in NavMenu.jsx
-    navigate("/login"); // ✅ Redirect to login page
+    if (isExerciseRunning) {
+      console.warn("Delaying session expiration until exercise is finished.");
+      return;
+    }
+
+    if (!sessionHandled) {
+      logoutUser();
+      setUser(null);
+      setSessionExpired(true);
+      setSessionHandled(true); // ✅ Prevent multiple alerts
+      navigate("/login");
+    }
   };
 
-  // ✅ Load user profile on mount & detect session expiration
   useEffect(() => {
     const fetchUser = async () => {
-      checkSessionExpiration(); // ✅ Check token expiration first
+      checkSessionExpiration();
 
       try {
         const userData = await getUserProfile();
         setUser(userData);
+        setSessionHandled(false); // ✅ Reset session handling if user logs in
       } catch (error) {
-        console.error("Not authenticated:", error);
+        // console.error("Not authenticated:", error);
         setUser(null);
 
         if (error.message === "Session expired") {
@@ -54,16 +65,14 @@ export function useAuth() {
     };
 
     fetchUser();
-
-    // ✅ Check session expiration every 60 seconds
     const interval = setInterval(fetchUser, 60000);
-
-    return () => clearInterval(interval); // ✅ Cleanup interval on unmount
+    return () => clearInterval(interval);
   }, []);
 
   return {
     user,
     loading,
+    sessionExpired,
     register: async (userData) => {
       await registerUser(userData);
       navigate("/login");
@@ -71,6 +80,7 @@ export function useAuth() {
     login: async (credentials) => {
       const data = await loginUser(credentials);
       setUser(data);
+      setSessionHandled(false); // ✅ Reset session handling after login
       navigate("/profile");
     },
     logout: () => {

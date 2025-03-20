@@ -1,34 +1,47 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import Swal from "sweetalert2";
+import { useAuth } from "./hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import BicepCurls from "./pages/BicepCurls";
 import Squats from "./pages/Squats";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+function GlobalSessionAlert() {
+  const navigate = useNavigate();
+  const { sessionExpired } = useAuth();
+
+  useEffect(() => {
+    if (sessionExpired) {
+      Swal.fire({
+        title: "Session Expired",
+        text: "Your session has expired. Please log in again.",
+        icon: "warning",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+      }).then(() => {
+        navigate("/login");
+      });
+    }
+  }, [sessionExpired, navigate]);
+
+  return null; // ✅ Ensures it runs globally without affecting layout
+}
 
 export default function App() {
   return (
     <Router>
+      <GlobalSessionAlert /> {/* ✅ Now it works on all pages */}
       <Routes>
-        {/* ✅ Launch Dashboard by default */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        
-        {/* Auth Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        {/* Main App Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* ✅ Add Profile Route */}
         <Route path="/profile" element={<Profile />} />
-        
-        {/* Exercise Routes */}
         <Route path="/bicep-curls" element={<BicepCurls />} />
         <Route path="/squats" element={<Squats />} />
-
-        {/* Catch all undefined routes */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </Router>
   );

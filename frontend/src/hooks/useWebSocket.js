@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { checkCamera as apiCheckCamera, createExerciseWebSocket } from "../api/websocket";
 
-export function useWebSocket() {
+export function useWebsocket() {
   const [image, setImage] = useState("");
   const [counter, setCounter] = useState(0);
   const [exerciseFinished, setExerciseFinished] = useState(false);

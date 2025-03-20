@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import Logo from "./Logo";
@@ -17,10 +17,18 @@ const NavMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth(); // ✅ Get user & logout function from useAuth
+  const [wasLoggedIn, setWasLoggedIn] = useState(false); // ✅ Track if user was logged in
 
-  // ✅ Show "Session Expired" alert when user becomes null
+  // ✅ Track previous login state
   useEffect(() => {
-    if (user === null) {
+    if (user) {
+      setWasLoggedIn(true); // ✅ Set true when user logs in
+    }
+  }, [user]);
+
+  // ✅ Show "Session Expired" alert only if the user was previously logged in
+  useEffect(() => {
+    if (wasLoggedIn && user === null) {
       Swal.fire({
         title: "Session Expired",
         text: "Your session has expired. Please log in again.",
@@ -31,11 +39,14 @@ const NavMenu = () => {
       }).then(() => {
         navigate("/login"); // ✅ Redirect to login
       });
+
+      setWasLoggedIn(false); // ✅ Reset state to prevent repeated alerts
     }
-  }, [user, navigate]);
+  }, [user, wasLoggedIn, navigate]);
 
   const handleLogout = () => {
     logout(); // ✅ Calls logout function from useAuth
+    setWasLoggedIn(false); // ✅ Reset to prevent session expired alert
 
     Swal.fire({
       title: "Logged Out",
