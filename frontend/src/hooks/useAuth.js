@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { registerUser, loginUser, getUserProfile, logoutUser } from "../api/auth";
-import { useWebsocket } from "../hooks/useWebsocket";
+import { useWebsocket } from "./useWebsocket";
 
 export function useAuth() {
   const [user, setUser] = useState(null);
