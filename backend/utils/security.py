@@ -8,7 +8,7 @@ import os
 load_dotenv()
 
 # ✅ Secure JWT settings
-SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")  # Use a strong, secret key
+SECRET_KEY = os.getenv("SECRET_KEY")  # Use a strong, secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 1  # Token expires in 30 minutes
 

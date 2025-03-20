@@ -68,6 +68,7 @@ API_HOST=0.0.0.0
 API_PORT=8000
 DATABASE_URL=postgresql://posturepal_user:password@localhost:5432/posturepal
 FRONTEND_ORIGINS=http://localhost:5173
+SECRET_KEY=55d10f0f652c1ddb210895fd5573545a4a449216bdb27d404f309d24db810ee6
 ```
 
 ## 📌 Backend Setup 📌

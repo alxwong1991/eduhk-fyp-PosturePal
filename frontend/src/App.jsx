@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useAuth } from "./hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
@@ -11,10 +11,13 @@ import Register from "./pages/Register";
 
 function GlobalSessionAlert() {
   const navigate = useNavigate();
-  const { sessionExpired } = useAuth();
+  const { sessionExpired, loading, setSessionExpired } = useAuth();
+  const [alertShown, setAlertShown] = useState(false); // ✅ Track if alert has been shown
 
   useEffect(() => {
-    if (sessionExpired) {
+    if (!loading && sessionExpired && !alertShown) { // ✅ Prevent multiple alerts
+      setAlertShown(true); // ✅ Mark alert as shown
+
       Swal.fire({
         title: "Session Expired",
         text: "Your session has expired. Please log in again.",
@@ -23,19 +26,22 @@ function GlobalSessionAlert() {
         allowOutsideClick: false,
         allowEscapeKey: false,
       }).then(() => {
+        setSessionExpired(false); // ✅ Reset session state
+        setAlertShown(false); // ✅ Allow future alerts after login
         navigate("/login");
       });
     }
-  }, [sessionExpired, navigate]);
+  }, [sessionExpired, loading, alertShown, navigate, setSessionExpired]);
 
-  return null; // ✅ Ensures it runs globally without affecting layout
+  return null;
 }
 
 export default function App() {
   return (
     <Router>
-      <GlobalSessionAlert /> {/* ✅ Now it works on all pages */}
+      <GlobalSessionAlert />
       <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/bicep-curls" element={<BicepCurls />} />
