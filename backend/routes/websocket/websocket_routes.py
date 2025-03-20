@@ -45,8 +45,9 @@ async def start_exercise(websocket: WebSocket, session: Session = Depends(get_se
     try:
         camera.start_capture()  # ✅ Start capturing video
 
-        # ✅ Extract parameters from WebSocket query string
-        query_params = websocket.query_params
+        query_string = websocket.scope["query_string"].decode()  # ✅ Extract query string
+        query_params = dict(param.split("=") for param in query_string.split("&") if "=" in param)
+
         exercise = query_params.get("exercise")
         difficulty = query_params.get("difficulty", DEFAULT_DIFFICULTY)
         user_id = query_params.get("user_id")

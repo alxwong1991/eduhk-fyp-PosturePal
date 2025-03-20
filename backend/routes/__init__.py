@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from routes.auth.auth_routes import auth_router
-from backend.routes.exercise_log.exercise_log_routes import exercise_log_router
+from routes.exercise_log.exercise_log_routes import exercise_log_router
 from routes.video.video_routes import video_router
 from routes.websocket.websocket_routes import websocket_router
 
