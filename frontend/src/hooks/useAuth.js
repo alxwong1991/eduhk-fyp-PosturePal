@@ -45,9 +45,16 @@ export function useAuth() {
     }
   }, [isExerciseRunning, sessionExpired, navigate]);
 
-  // ✅ Fetch user data on mount and every minute
+  // ✅ Fetch user data on mount and every minute if a token exists
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setUser(null);  // ✅ If no token, set user to null and stop fetching
+        setLoading(false);
+        return;
+      }
+
       checkSessionExpiration();
 
       try {

@@ -20,6 +20,7 @@ export async function saveExerciseLog(userId, exerciseName, totalReps, totalCalo
       {
         user_id: userId,
         exercise_name: exerciseName,
+        total_reps: totalReps,
         calories_burned: totalCalories,
         duration_minutes: durationMinutes
       },
