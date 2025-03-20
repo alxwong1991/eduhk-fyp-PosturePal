@@ -16,7 +16,7 @@ class BicepCurls:
         self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # ✅ Timer setup
-        self.timer = 60
+        self.timer = 180
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
