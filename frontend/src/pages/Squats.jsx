@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
-import { showResult } from "../components/ShowResult";
+import showResult from "../components/ShowResult";
 import { showCameraError } from "../components/ShowCameraError";
 import { useWebsocket } from "../hooks/useWebsocket";
 import { useAuth } from "../hooks/useAuth";
@@ -57,9 +57,6 @@ export default function Squats() {
           </ExerciseButton>
           <ExerciseButton onClick={() => setDifficulty("hard")}>
             Hard
-          </ExerciseButton>
-          <ExerciseButton onClick={() => navigate("/dashboard")}>
-            Return to Dashboard
           </ExerciseButton>
         </>
       )}
