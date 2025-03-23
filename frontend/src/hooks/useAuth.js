@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { registerUser, loginUser, getUserProfile, logoutUser } from "../api/auth";
-import { useWebsocket } from "../hooks/useWebsocket";
+import { useWebsocket } from "./useWebsocket";
 
 export function useAuth() {
   const [user, setUser] = useState(null);
@@ -10,24 +10,6 @@ export function useAuth() {
   const [sessionExpired, setSessionExpired] = useState(false);
   const navigate = useNavigate();
   const { isExerciseRunning } = useWebsocket();
-
-  // ✅ Memoized function to check session expiration
-  const checkSessionExpiration = useCallback(() => {
-    const token = localStorage.getItem("access_token");
-    if (!token) return;
-
-    try {
-      const decoded = jwtDecode(token);
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      if (decoded.exp < currentTime) {
-        console.warn("Session expired detected.");
-        handleSessionExpired();
-      }
-    } catch (error) {
-      console.error("Error decoding JWT:", error);
-    }
-  }, []);
 
   // ✅ Handles session expiration and prevents multiple triggers
   const handleSessionExpired = useCallback(() => {
@@ -45,9 +27,34 @@ export function useAuth() {
     }
   }, [isExerciseRunning, sessionExpired, navigate]);
 
-  // ✅ Fetch user data on mount and every minute
+  // ✅ Memoized function to check session expiration
+  const checkSessionExpiration = useCallback(() => {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+
+      if (decoded.exp < currentTime) {
+        console.warn("Session expired detected.");
+        handleSessionExpired();
+      }
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
+    }
+  }, [handleSessionExpired]); // ✅ Now it correctly references handleSessionExpired
+
+  // ✅ Fetch user data on mount and every minute if a token exists
   useEffect(() => {
     const fetchUser = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        setUser(null);  // ✅ If no token, set user to null and stop fetching
+        setLoading(false);
+        return;
+      }
+
       checkSessionExpiration();
 
       try {

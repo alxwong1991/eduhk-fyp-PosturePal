@@ -5,6 +5,7 @@ class ExerciseCreate(BaseModel):
     """Schema for logging an exercise."""
     user_id: int
     exercise_name: str
+    total_reps: int
     calories_burned: float
     duration_minutes: float
 
@@ -13,6 +14,7 @@ class ExerciseResponse(BaseModel):
     id: int
     user_id: int
     exercise_name: str
+    total_reps: int
     calories_burned: float
     duration_minutes: float
     exercise_date: datetime

@@ -18,15 +18,15 @@ if not DATABASE_URL:
 # ✅ Alembic Config object
 config = context.config
 
-# ✅ Manually set the database URL in Alembic config
+# ✅ Set the database URL in Alembic config (AFTER validation)
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # ✅ Setup logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# ✅ Import models (Make sure all models are imported)
-from models.user import User  # Import all your models here
+# ✅ Import all models dynamically (instead of manually importing each one)
+from models import user, exercise_log  # Add all model files here
 
 # ✅ Set metadata for autogeneration
 target_metadata = SQLModel.metadata

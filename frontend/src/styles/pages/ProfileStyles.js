@@ -5,7 +5,7 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 4rem 2rem;
-  background: linear-gradient(135deg, #1f1c2c, #928dab); /* ✅ Modern gradient background */
+  background: linear-gradient(135deg, #1e2a3a 0%, #3d4856 100%);
   min-height: 100vh;
 `;
 

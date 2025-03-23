@@ -1,32 +1,45 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
-import { showResult } from "../components/ShowResult";
+import showResult from "../components/ShowResult";
 import { showCameraError } from "../components/ShowCameraError";
 import { useWebsocket } from "../hooks/useWebsocket";
-import {
-  ExerciseLayout,
-  ExerciseButton,
-} from "../components/ExerciseLayout";
+import { useAuth } from "../hooks/useAuth";
+import { ExerciseLayout, ExerciseButton } from "../components/ExerciseLayout";
 
 export default function BicepCurls() {
   const [difficulty, setDifficulty] = useState(null);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
+  const { user } = useAuth(); // ✅ Get user data (can be null for guests)
   const { image, exerciseFinished, startWebSocketExercise } = useWebsocket();
 
   async function startExercise() {
-    if (!difficulty) return; // Ensure difficulty is selected
+    if (!difficulty) return; // ✅ Allow guests, but difficulty must be selected
 
     setIsExerciseRunning(true);
     await showCountdown();
+    const startTime = Date.now(); // ✅ Track start time
 
     try {
-      await startWebSocketExercise("bicep_curls", difficulty, (totalReps) => {
-        setIsExerciseRunning(false);
-        showResult(totalReps);
-      });
+      await startWebSocketExercise(
+        "bicep_curls",
+        difficulty,
+        (totalReps, totalCalories) => {
+          setIsExerciseRunning(false);
+          const durationMinutes = (Date.now() - startTime) / 60000;
+
+          // ✅ Pass user ID only if logged in
+          showResult(
+            totalReps,
+            "bicep_curls",
+            totalCalories,
+            durationMinutes,
+            user
+          );
+        }
+      );
     } catch (error) {
       console.error("Camera error:", error);
       setIsExerciseRunning(false);

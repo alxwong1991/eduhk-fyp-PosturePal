@@ -1,40 +1,44 @@
 import Swal from "sweetalert2";
-import { useAuth } from "../hooks/useAuth";
-import axios from "axios";
+import { useExerciseLog } from "../hooks/useExerciseLog";
 
-export async function showResult(totalReps, caloriesBurned) {
-  const { user } = useAuth(); // ✅ Get logged-in user
+export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurned, durationMinutes, userId }) {
+  const { saveLog } = useExerciseLog();  // ✅ Now it's inside a React component
 
-  const result = await Swal.fire({
-    title: "Workout Complete! 🎉",
-    html: `
-      <p>You completed <strong>${totalReps}</strong> reps!</p>
-      <p>Calories burned: <strong>${caloriesBurned.toFixed(2)}</strong> kcal</p>
-    `,
-    icon: "success",
-    showCancelButton: user ? true : false, // ✅ Only show "Save" if logged in
-    confirmButtonText: user ? "Save" : "Close",
-    cancelButtonText: "Close",
-  });
-
-  if (result.isConfirmed && user) {
-    saveWorkout(totalReps, caloriesBurned);
+  async function handleSave() {
+    if (userId) {
+      try {
+        await saveLog(userId, exerciseName, totalReps, totalCaloriesBurned, durationMinutes);
+        Swal.fire("Saved!", "Your workout has been saved.", "success");
+      } catch (error) {
+        Swal.fire("Error", "Failed to save workout.", error);
+      }
+    }
   }
-}
 
-// ✅ Save workout data
-async function saveWorkout(totalReps, caloriesBurned) {
-  try {
-    const token = localStorage.getItem("access_token");
+  async function showPopup() {
+    let resultMessage = `<p>You completed <strong>${totalReps}</strong> reps!</p>`;
 
-    await axios.post(
-      "/api/workouts/save",
-      { totalReps, caloriesBurned },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    if (userId && totalCaloriesBurned !== undefined) {
+      resultMessage += `<p>Calories burned: <strong>${totalCaloriesBurned.toFixed(2)}</strong> kcal</p>`;
+    }
 
-    Swal.fire("Saved!", "Your workout has been saved.", "success");
-  } catch (error) {
-    Swal.fire("Error", "Failed to save workout.", "error");
+    if (!userId) {
+      resultMessage += `<p><em>⚠️ Log in to save your progress.</em></p>`;
+    }
+
+    const result = await Swal.fire({
+      title: "Workout Complete! 🎉",
+      html: resultMessage,
+      icon: "success",
+      showCancelButton: !!userId,
+      confirmButtonText: userId ? "Save" : "Close",
+      cancelButtonText: "Close",
+    });
+
+    if (result.isConfirmed && userId) {
+      handleSave();
+    }
   }
+
+  return <button onClick={showPopup}>Show Results</button>;
 }

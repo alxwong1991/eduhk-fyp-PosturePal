@@ -8,6 +8,7 @@ class ExerciseLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")  # ✅ Links to User table
     exercise_name: str
+    total_reps: int
     calories_burned: float
     duration_minutes: float
     exercise_date: datetime = Field(default_factory=datetime.utcnow)
