@@ -23,10 +23,10 @@
 #         frame, angle, counter = self.squats.perform_exercise(frame)
 #         return frame, angle, counter
 
-from mediapipe.python.solutions import pose as mp_pose
+# from mediapipe.python.solutions import pose as mp_pose
 from exercises.bicep_curls import BicepCurls
 from exercises.squats import Squats
-from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
+# from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 
 class ExerciseHelper:
     def __init__(self):
@@ -36,7 +36,7 @@ class ExerciseHelper:
     def setup_exercise(self, exercise_name):
         """✅ Ensure Pose detector is properly reset before starting a new exercise."""
         if exercise_name in self.exercises:
-            del self.exercises[exercise_name] # ✅ Delete previous instance to force recreation
+            del self.exercises[exercise_name]  # ✅ Delete previous instance to force recreation
 
         exercise_classes = {
             "bicep_curls": BicepCurls,
@@ -45,8 +45,14 @@ class ExerciseHelper:
 
         if exercise_name not in exercise_classes:
             raise ValueError(f"Invalid exercise: {exercise_name}")
-        
-        self.exercises[exercise_name] = exercise_classes[exercise_name]()
+
+        # ✅ Ensure the exercise instance is created
+        try:
+            self.exercises[exercise_name] = exercise_classes[exercise_name]()
+            print(f"✅ Successfully initialized {exercise_name}")
+        except Exception as e:
+            print(f"❌ Failed to initialize {exercise_name}: {e}")
+            raise RuntimeError(f"Could not initialize {exercise_name}")
 
     def set_difficulty(self, exercise_name, difficulty):
         """✅ Set difficulty level for an exercise."""

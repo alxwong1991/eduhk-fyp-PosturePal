@@ -18,47 +18,50 @@ export async function checkCamera() {
   }
 }
 
-// ✅ Start a WebSocket connection for an exercise
 export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onComplete) {
   try {
-    const wsUrl = `${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}`;
+    const userId = localStorage.getItem("user_id"); // ✅ Get user ID if logged in
+    const wsUrl = userId
+      ? `${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}&user_id=${userId}`
+      : `${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}`;
+
+    console.log("🔹 WebSocket URL:", wsUrl);
+
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-      console.log("WebSocket connected:", ws.url);
+      console.log("✅ WebSocket connected:", ws.url);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+
         if (data.event === "update_frame") {
           onMessage(data.image, data.counter);
         }
+
         if (data.event === "exercise_complete") {
           ws.close();
-          if (onComplete) onComplete(data.total_reps);
+          if (onComplete) onComplete(data); // ✅ Pass data to ShowResult
         }
       } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+        console.error("❌ Error parsing WebSocket message:", error);
       }
     };
 
     ws.onerror = (error) => {
-      console.error("WebSocket Error:", error);
+      console.error("❌ WebSocket Error:", error);
       ws.close();
     };
 
     ws.onclose = (event) => {
-      if (event.wasClean) {
-        console.log("WebSocket connection closed cleanly");
-      } else {
-        console.error("WebSocket connection closed unexpectedly");
-      }
+      console.log("✅ WebSocket connection closed", event);
     };
 
     return ws;
   } catch (error) {
-    console.error("Failed to create WebSocket connection:", error);
+    console.error("❌ Failed to create WebSocket connection:", error);
     return null;
   }
 }

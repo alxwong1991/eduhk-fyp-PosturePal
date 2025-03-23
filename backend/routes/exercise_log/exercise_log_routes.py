@@ -25,8 +25,7 @@ def log_exercise(exercise_data: ExerciseCreate, session: Session = Depends(get_s
         exercise_date=datetime.now(timezone.utc),
     )
 
-    # ✅ Update daily calories burned
-    user.daily_calories_burned += exercise_data.calories_burned
+    user.daily_calories_burned += exercise_data.calories_burned  # ✅ Update daily burned calories
 
     session.add(new_exercise)
     session.commit()

@@ -113,6 +113,11 @@ python -m uvicorn main:app --reload
 
 ## 📌 Additional Backend Commands (Optional) 📌
 
+### Remove Everything in Docker (⚠ Dangerous)
+```sh
+docker system prune -a -f --volumes
+```
+
 ### After installing new packages, update requirements.txt:
 ```sh
 pip freeze > requirements.txt

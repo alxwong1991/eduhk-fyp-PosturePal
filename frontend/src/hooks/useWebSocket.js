@@ -4,11 +4,11 @@ import { checkCamera as apiCheckCamera, createExerciseWebSocket } from "../api/w
 export function useWebsocket() {
   const [image, setImage] = useState("");
   const [counter, setCounter] = useState(0);
+  const [calories, setCalories] = useState(null);  // ✅ Track calories only for logged-in users
   const [exerciseFinished, setExerciseFinished] = useState(false);
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const webSocketRef = useRef(null); // ✅ Store WebSocket instance
+  const webSocketRef = useRef(null);
 
-  // ✅ Check camera and update state
   const checkCamera = async () => {
     const isReady = await apiCheckCamera();
     setIsCameraReady(isReady);
@@ -17,17 +17,16 @@ export function useWebsocket() {
 
   const startWebSocketExercise = async (exerciseType, difficulty, onComplete) => {
     setCounter(0);
+    setCalories(null);
     setImage("");
     setExerciseFinished(false);
 
-    // ✅ Ensure camera is ready before starting WebSocket
     const cameraReady = await checkCamera();
     if (!cameraReady) {
       console.error("Camera is not ready, aborting exercise.");
       return;
     }
 
-    // ✅ Close previous WebSocket if it exists
     if (webSocketRef.current) {
       webSocketRef.current.close();
       webSocketRef.current = null;
@@ -37,20 +36,23 @@ export function useWebsocket() {
       const ws = createExerciseWebSocket(
         exerciseType,
         difficulty,
-        (newImage, newCounter) => {
+        (newImage, newCounter, newCalories) => {
           setImage(`data:image/jpeg;base64,${newImage}`);
           setCounter(newCounter);
+          if (newCalories !== undefined) {
+            setCalories(newCalories);  // ✅ Update calories only if available
+          }
         },
-        (totalReps) => {
+        (data) => {
           setExerciseFinished(true);
           setTimeout(() => {
-            webSocketRef.current = null; // ✅ Ensure cleanup happens after WebSocket closes
+            webSocketRef.current = null;
           }, 100);
-          if (onComplete) onComplete(totalReps);
+          if (onComplete) onComplete(data);
         }
       );
 
-      webSocketRef.current = ws; // ✅ Store WebSocket in ref
+      webSocketRef.current = ws;
     } catch (error) {
       console.error("Error starting WebSocket exercise:", error);
     }
@@ -68,6 +70,7 @@ export function useWebsocket() {
   return {
     image,
     counter,
+    calories,  // ✅ Only available for logged-in users
     exerciseFinished,
     isCameraReady,
     startWebSocketExercise,

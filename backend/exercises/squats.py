@@ -16,7 +16,7 @@ class Squats:
         self.max_reps = DIFFICULTY_LEVELS.get("squats", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # Countdown timer
-        self.timer = 180
+        self.timer = 20
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
@@ -85,6 +85,8 @@ class Squats:
 
         image, landmarks = self.detect(frame)
 
+        angle = 0  # ✅ Ensure `angle` is always initialized
+
         if landmarks:
             # Get coordinates for squat angle calculation
             hip = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP].x,
@@ -95,6 +97,14 @@ class Squats:
                      landmarks.landmark[mp_pose.PoseLandmark.LEFT_ANKLE].y]
 
             angle = self.calculate_angle(hip, knee, ankle)
+
+            update_result = self.update(angle, landmarks, frame)
+            if isinstance(update_result, int):
+                self.counter = update_result
+            else:
+                print(f"❌ ERROR: update() returned {update_result}, expected an integer")
+                return frame, angle, self.counter, False
+
             self.counter = self.update(angle, landmarks, frame)
             
             self.ui_renderer.provide_feedback(landmarks, image, "squats", squat_angle=angle)

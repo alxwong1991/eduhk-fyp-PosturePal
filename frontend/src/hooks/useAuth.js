@@ -11,6 +11,22 @@ export function useAuth() {
   const navigate = useNavigate();
   const { isExerciseRunning } = useWebsocket();
 
+  // ✅ Handles session expiration and prevents multiple triggers
+  const handleSessionExpired = useCallback(() => {
+    if (isExerciseRunning) {
+      console.warn("Delaying session expiration until exercise is finished.");
+      return;
+    }
+
+    if (!sessionExpired) {
+      console.warn("Logging out due to session expiration.");
+      logoutUser();
+      setUser(null);
+      setSessionExpired(true);
+      navigate("/login");
+    }
+  }, [isExerciseRunning, sessionExpired, navigate]);
+
   // ✅ Memoized function to check session expiration
   const checkSessionExpiration = useCallback(() => {
     const token = localStorage.getItem("access_token");
@@ -27,23 +43,7 @@ export function useAuth() {
     } catch (error) {
       console.error("Error decoding JWT:", error);
     }
-  }, []);
-
-  // ✅ Handles session expiration and prevents multiple triggers
-  const handleSessionExpired = useCallback(() => {
-    if (isExerciseRunning) {
-      console.warn("Delaying session expiration until exercise is finished.");
-      return;
-    }
-
-    if (!sessionExpired) {
-      console.warn("Logging out due to session expiration.");
-      logoutUser();
-      setUser(null);
-      setSessionExpired(true);
-      navigate("/login");
-    }
-  }, [isExerciseRunning, sessionExpired, navigate]);
+  }, [handleSessionExpired]); // ✅ Now it correctly references handleSessionExpired
 
   // ✅ Fetch user data on mount and every minute if a token exists
   useEffect(() => {

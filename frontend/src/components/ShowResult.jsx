@@ -1,15 +1,19 @@
 import Swal from "sweetalert2";
 import { useExerciseLog } from "../hooks/useExerciseLog";
 
-export async function showResult(totalReps, exerciseName, totalCaloriesBurned, durationMinutes, user) {
+export async function showResult(totalReps, exerciseName, totalCaloriesBurned, durationMinutes, userId) {
   const { saveLog } = useExerciseLog();
 
-  let resultMessage = `
-    <p>You completed <strong>${totalReps}</strong> reps!</p>
-    <p>Calories burned: <strong>${totalCaloriesBurned.toFixed(2)}</strong> kcal</p>
-  `;
+  // ✅ Base message for all users
+  let resultMessage = `<p>You completed <strong>${totalReps}</strong> reps!</p>`;
 
-  if (!user) {
+  // ✅ Only show calories for logged-in users
+  if (userId && totalCaloriesBurned !== undefined) {
+    resultMessage += `<p>Calories burned: <strong>${totalCaloriesBurned.toFixed(2)}</strong> kcal</p>`;
+  }
+
+  // ✅ Warning for guests
+  if (!userId) {
     resultMessage += `<p><em>⚠️ Log in to save your progress.</em></p>`;
   }
 
@@ -17,17 +21,18 @@ export async function showResult(totalReps, exerciseName, totalCaloriesBurned, d
     title: "Workout Complete! 🎉",
     html: resultMessage,
     icon: "success",
-    showCancelButton: user ? true : false,
-    confirmButtonText: user ? "Save" : "Close",
+    showCancelButton: !!userId,  // ✅ Show "Save" only if logged in
+    confirmButtonText: userId ? "Save" : "Close",
     cancelButtonText: "Close",
   });
 
-  if (result.isConfirmed && user) {
+  // ✅ Save workout only if the user is logged in
+  if (result.isConfirmed && userId) {
     try {
-      await saveLog(user.id, exerciseName, totalReps, totalCaloriesBurned, durationMinutes);
+      await saveLog(userId, exerciseName, totalReps, totalCaloriesBurned, durationMinutes);
       Swal.fire("Saved!", "Your workout has been saved.", "success");
     } catch (error) {
-      Swal.fire("Error", "Failed to save workout.", "error");
+      Swal.fire("Error", "Failed to save workout.", error);
     }
   }
 }

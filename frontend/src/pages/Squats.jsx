@@ -23,12 +23,16 @@ export default function Squats() {
     const startTime = Date.now();
 
     try {
-      await startWebSocketExercise("squats", difficulty, (totalReps, totalCalories) => {
-        setIsExerciseRunning(false);
-        const durationMinutes = (Date.now() - startTime) / 60000;
+      await startWebSocketExercise(
+        "squats",
+        difficulty,
+        (totalReps, totalCalories) => {
+          setIsExerciseRunning(false);
+          const durationMinutes = (Date.now() - startTime) / 60000;
 
-        showResult(totalReps, "squats", totalCalories, durationMinutes, user);
-      });
+          showResult(totalReps, "squats", totalCalories, durationMinutes, user);
+        }
+      );
     } catch (error) {
       console.error("Camera error:", error);
       setIsExerciseRunning(false);
@@ -45,19 +49,34 @@ export default function Squats() {
       {!difficulty && (
         <>
           <h3>Select Difficulty:</h3>
-          <ExerciseButton onClick={() => setDifficulty("easy")}>Easy</ExerciseButton>
-          <ExerciseButton onClick={() => setDifficulty("medium")}>Medium</ExerciseButton>
-          <ExerciseButton onClick={() => setDifficulty("hard")}>Hard</ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("easy")}>
+            Easy
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("medium")}>
+            Medium
+          </ExerciseButton>
+          <ExerciseButton onClick={() => setDifficulty("hard")}>
+            Hard
+          </ExerciseButton>
+          <ExerciseButton onClick={() => navigate("/dashboard")}>
+            Return to Dashboard
+          </ExerciseButton>
         </>
       )}
 
       {difficulty && (
         <>
-          <h2>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h2>
+          <h2>
+            Difficulty:{" "}
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </h2>
 
           {!isExerciseRunning && (
             <>
-              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
+              <ExerciseButton
+                onClick={startExercise}
+                disabled={exerciseFinished}
+              >
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>

@@ -16,7 +16,7 @@ class BicepCurls:
         self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # ✅ Timer setup
-        self.timer = 180
+        self.timer = 20
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
@@ -86,6 +86,9 @@ class BicepCurls:
 
     def update(self, angle, landmarks):
         """✅ Update exercise counter and display feedback messages."""
+        arm_message = None  # ✅ Ensure initialization
+        arm_color = (255, 255, 255)  # ✅ Default white color
+
         if landmarks:
             # ✅ Get feedback message
             arm_message, arm_color = self.feedback_handler.check_arm_extension(landmarks)
@@ -103,7 +106,7 @@ class BicepCurls:
                 self.counter += 1  # ✅ Increment only when posture is correct
                 print("Curl")
 
-        return self.counter, arm_message, arm_color
+        return self.counter, arm_color
 
     def perform_exercise(self, frame, max_reps):
         """✅ Process frame and track bicep curls exercise with correct posture check."""
@@ -120,8 +123,7 @@ class BicepCurls:
         image, landmarks = self.detect(frame)
 
         # # ✅ Ensure angle is always initialized
-        # angle = 0  
-        # arm_message, arm_color = None, (255, 255, 255)  # ✅ Default color
+        angle = 0  
 
         if landmarks:
             shoulder = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER].x, 
@@ -132,6 +134,13 @@ class BicepCurls:
                     landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y]
 
             angle = self.calculate_angle(shoulder, elbow, wrist)
+
+            update_result = self.update(angle, landmarks)
+            if isinstance(update_result, tuple) and len(update_result) == 2:
+                self.counter, arm_color = update_result  # ✅ Corrected unpacking
+            else:
+                print(f"❌ ERROR: update() returned {update_result}, expected (counter, arm_color)")
+                return frame, angle, self.counter, False  # ✅ Prevent crash
 
             # ✅ Pass landmarks to update() to ensure correct form before counting
             self.counter, arm_color = self.update(angle, landmarks)
