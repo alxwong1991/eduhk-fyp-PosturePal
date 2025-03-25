@@ -45,16 +45,26 @@ const useWebsocketStore = create((set) => ({
           if (onComplete) onComplete(data);
         }
       );
-
+    
       set({ webSocket: ws });
+    
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        set({ exerciseFinished: true, webSocket: null });
+        if (onComplete) onComplete(null);  // ✅ Ensure `onComplete` is called even if there’s an error
+      };
     } catch (error) {
       console.error("Error starting WebSocket exercise:", error);
+      set({ exerciseFinished: true });
+      if (onComplete) onComplete(null);  // ✅ Ensure callback is always executed
     }
   },
 
   stopWebSocketExercise: () => {
     set((state) => {
-      if (state.webSocket) state.webSocket.close();
+      if (state.webSocket && state.webSocket.readyState === WebSocket.OPEN) {
+        state.webSocket.close();
+      }
       return { webSocket: null, exerciseFinished: true };
     });
   },

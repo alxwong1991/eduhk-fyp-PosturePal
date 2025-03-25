@@ -8,6 +8,7 @@ import BicepCurls from "./pages/BicepCurls";
 import Squats from "./pages/Squats";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Result from "./pages/Result";
 
 function GlobalSessionAlert() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/squats" element={<Squats />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/results" element={<Result />} />
       </Routes>
     </Router>
   );

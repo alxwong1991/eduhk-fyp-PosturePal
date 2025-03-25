@@ -1,4 +1,3 @@
-import Swal from "sweetalert2";
 import useExerciseLogStore from "../stores/exerciseLogStore";
 
 export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurned, durationMinutes, userId }) {
@@ -8,37 +7,24 @@ export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurne
     if (userId) {
       try {
         await saveLog(userId, exerciseName, totalReps, totalCaloriesBurned, durationMinutes);
-        Swal.fire("Saved!", "Your workout has been saved.", "success");
+        alert("Workout saved successfully!");
       } catch (error) {
-        Swal.fire("Error", "Failed to save workout.", error);
+        alert("Failed to save workout.");
       }
     }
   }
 
-  async function showPopup() {
-    let resultMessage = `<p>You completed <strong>${totalReps}</strong> reps!</p>`;
+  return (
+    <>
+      <p><strong>You completed:</strong> {totalReps} reps</p>
 
-    if (userId && totalCaloriesBurned !== undefined) {
-      resultMessage += `<p>Calories burned: <strong>${totalCaloriesBurned.toFixed(2)}</strong> kcal</p>`;
-    }
+      {userId && totalCaloriesBurned !== undefined && (
+        <p><strong>Calories burned:</strong> {totalCaloriesBurned.toFixed(2)} kcal</p>
+      )}
 
-    if (!userId) {
-      resultMessage += `<p><em>⚠️ Log in to save your progress.</em></p>`;
-    }
-
-    const result = await Swal.fire({
-      title: "Workout Complete! 🎉",
-      html: resultMessage,
-      icon: "success",
-      showCancelButton: !!userId,
-      confirmButtonText: userId ? "Save" : "Close",
-      cancelButtonText: "Close",
-    });
-
-    if (result.isConfirmed && userId) {
-      handleSave();
-    }
-  }
-
-  return <button onClick={showPopup}>Show Results</button>;
+      {userId && (
+        <button onClick={handleSave}>Save Workout</button>
+      )}
+    </>
+  );
 }
