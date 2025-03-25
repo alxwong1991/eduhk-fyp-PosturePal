@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import Logo from "./Logo";
-import { useAuth } from "../hooks/useAuth"; // ✅ Import useAuth
+import useAuthStore from "../stores/authStore";
 import {
   NavContainer,
   NavContent,
@@ -16,7 +16,7 @@ import {
 const NavMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth(); // ✅ Get user & logout function from useAuth
+  const { user, logout } = useAuthStore(); // ✅ Get user & logout function from useAuth
   const [wasLoggedIn, setWasLoggedIn] = useState(false); // ✅ Track if user was logged in
 
   // ✅ Track previous login state

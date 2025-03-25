@@ -2,19 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import Logo from "../components/Logo";
-import { loginUser } from "../api/auth";
-import { 
-  Container, 
-  FormCard, 
-  Title, 
-  Form, 
-  Input, 
-  Button, 
-  LinkText, 
-  LogoSection 
+import useAuthStore from "../stores/authStore";
+import {
+  Container,
+  FormCard,
+  Title,
+  Form,
+  Input,
+  Button,
+  LinkText,
+  LogoSection,
 } from "../styles/pages/LoginStyles";
 
 export default function Login() {
+  const { login } = useAuthStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
@@ -23,25 +24,18 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await loginUser(formData);
+      await login(formData);
       Swal.fire({
         title: "Success",
         text: "Login successful!",
         icon: "success",
       }).then(() => {
-        console.log("Dispatching storage event after login...");
         window.dispatchEvent(new Event("storage"));
         navigate("/dashboard");
       });
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "Invalid credentials: " + error,
-        icon: "error",
-        confirmButtonText: "Try Again",
-      });
+      Swal.fire("Error", "Invalid credentials: " + error, "error");
     }
   };
 
@@ -50,7 +44,7 @@ export default function Login() {
       <LogoSection>
         <Logo onClick={() => navigate("/")} large />
       </LogoSection>
-      
+
       <FormCard>
         <Title>Welcome Back</Title>
         <Form onSubmit={handleSubmit}>
@@ -73,9 +67,9 @@ export default function Login() {
             required
           />
           <Button type="submit">Login</Button>
-          
-          <Button 
-            type="button" 
+
+          <Button
+            type="button"
             onClick={() => navigate("/dashboard")}
             style={{ backgroundColor: "#666", marginTop: "10px" }}
           >

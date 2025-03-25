@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { useAuth } from "./hooks/useAuth";
+import useAuthStore from "./stores/authStore";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import BicepCurls from "./pages/BicepCurls";
@@ -11,7 +11,7 @@ import Register from "./pages/Register";
 
 function GlobalSessionAlert() {
   const navigate = useNavigate();
-  const { sessionExpired, loading, setSessionExpired } = useAuth();
+  const { sessionExpired, loading, setSessionExpired } = useAuthStore();
   const [alertShown, setAlertShown] = useState(false); // ✅ Track if alert has been shown
 
   useEffect(() => {

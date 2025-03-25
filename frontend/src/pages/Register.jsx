@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { registerUser } from "../api/auth";
+import useAuthStore from "../stores/authStore";
 import {
   Container,
   Form,
@@ -14,6 +14,7 @@ import {
 } from "../styles/pages/RegisterStyles";
 
 export default function Register() {
+  const {register} = useAuthStore();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -136,16 +137,18 @@ export default function Register() {
     }
 
     try {
-      await registerUser({
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-        gender: formData.gender,
-        age: formData.age,
-        dob: formData.dob,
-        height_cm: formData.height_cm,
-        weight_kg: formData.weight_kg,
-      });
+      // await register({
+      //   name: formData.name,
+      //   email: formData.email,
+      //   password: formData.password,
+      //   gender: formData.gender,
+      //   age: formData.age,
+      //   dob: formData.dob,
+      //   height_cm: formData.height_cm,
+      //   weight_kg: formData.weight_kg,
+      // });
+
+      await register(formData);
 
       Swal.fire({
         title: "Success",

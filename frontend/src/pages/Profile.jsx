@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/useAuth";
+import useAuthStore from "../stores/authStore";
 import NavMenu from "../components/NavMenu";
 import {
   Container,
@@ -12,7 +12,7 @@ import {
 } from "../styles/pages/ProfileStyles";
 
 export default function Profile() {
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuthStore();
 
   if (loading) {
     return <Container>Loading profile...</Container>;
