@@ -43,7 +43,18 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
 
         if (data.event === "exercise_complete") {
           ws.close();
-          if (onComplete) onComplete(data); // ✅ Pass data to ShowResult
+
+          // ✅ Ensure only valid data is passed
+          const resultData = {
+            totalReps: data.total_reps ?? 0,
+            totalCaloriesBurned: data.total_calories_burned ?? 0,
+            userId: data.user_id ?? null,
+            exerciseName: exerciseType, // ✅ Ensure exercise name is included
+            durationMinutes: data.duration_minutes ?? 0, // ✅ Ensure duration is included
+          };
+
+          console.log(resultData, "hihihi");
+          if (onComplete) onComplete(resultData);
         }
       } catch (error) {
         console.error("❌ Error parsing WebSocket message:", error);
@@ -53,6 +64,10 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
     ws.onerror = (error) => {
       console.error("❌ WebSocket Error:", error);
       ws.close();
+
+      if (onComplete) {
+        onComplete({ totalReps: 0, totalCaloriesBurned: 0, userId: null, exerciseName: exerciseType, durationMinutes: 0 });
+      }
     };
 
     ws.onclose = (event) => {

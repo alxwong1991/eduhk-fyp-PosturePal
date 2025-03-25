@@ -54,11 +54,24 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
         return None, None, None, True
 
     elapsed_time = asyncio.get_event_loop().time() - start_time
-    duration_minutes = elapsed_time / 60
+    duration_seconds = round(elapsed_time, 2)  # ✅ Keep in seconds
+    duration_minutes = round(duration_seconds / 60, 2)  # ✅ Convert to minutes only for logging
 
-    if user:
-        calories_burned = calculate_calories_burned(user.weight_kg, exercise, duration_minutes)
-        total_calories_burned = calories_burned
+    print(f"⏳ Elapsed Time: {duration_seconds} sec ({duration_minutes} min)")
+
+    # ✅ Set default weight if user is not logged in
+    weight_kg = 80 if user is None else user.weight_kg
+
+    if weight_kg is None:
+        print("❌ ERROR: User weight is missing! Using default 80kg.")
+        weight_kg = 80
+
+    print(f"🔍 Using Weight: {weight_kg} kg for calorie calculation")
+
+    # ✅ Calculate calories burned correctly
+    calories_burned = calculate_calories_burned(weight_kg, exercise, duration_seconds)
+    total_calories_burned += calories_burned  # ✅ Accumulate calories instead of overwriting
+    print(f"🔥 Calories Burned: {calories_burned:.2f} kcal (Total: {total_calories_burned:.2f} kcal)")
 
     _, buffer = cv2.imencode(".jpg", frame)
     base64_frame = base64.b64encode(buffer).decode("utf-8")
@@ -66,24 +79,23 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
     response_data = {
         "event": "update_frame",
         "image": base64_frame,
-        "counter": counter
+        "counter": counter,
+        "durationSeconds": duration_seconds,  # ✅ Logging only (not used for calculation)
+        "totalCaloriesBurned": round(total_calories_burned, 2)  # ✅ Ensure correct rounding
     }
-
-    if user:
-        response_data["calories_burned"] = round(total_calories_burned, 2)
 
     await websocket.send_json(response_data)
 
     return counter, total_calories_burned, time_up, False
 
-async def save_exercise_log(session, user, exercise, counter, total_calories_burned, duration_minutes):
+async def save_exercise_log(session, user, exercise, counter, total_calories_burned, duration_seconds):
     """Save the exercise log to the database for logged-in users."""
     new_exercise_log = ExerciseLog(
         user_id=user.id,
         exercise_name=exercise,
         total_reps=counter,
         calories_burned=round(total_calories_burned, 2),
-        duration_minutes=round(duration_minutes, 2),
+        duration_minutes=round(duration_seconds / 60, 2),  # ✅ Convert seconds to minutes
         exercise_date=datetime.now(timezone.utc),
     )
     user.daily_calories_burned += total_calories_burned
@@ -115,11 +127,15 @@ async def start_exercise_session(websocket, session, camera, exercise_helper, ex
             break
 
         if counter >= max_reps or time_up:
+            elapsed_time = asyncio.get_event_loop().time() - start_time
+            duration_minutes = round(elapsed_time / 60, 2)
+
             await websocket.send_json({
                 "event": "exercise_complete",
                 "message": "Workout complete!",
                 "total_reps": counter,
                 "total_calories_burned": round(total_calories_burned, 2) if user else None,
+                "durationMinutes": duration_minutes,
                 "user_id": user.id if user else None
             })
             break
@@ -127,7 +143,7 @@ async def start_exercise_session(websocket, session, camera, exercise_helper, ex
         await asyncio.sleep(0.1)
 
     if user:
-        await save_exercise_log(session, user, exercise, counter, total_calories_burned, (asyncio.get_event_loop().time() - start_time) / 60)
+        await save_exercise_log(session, user, exercise, counter, total_calories_burned, elapsed_time)
 
 async def handle_exercise_websocket(websocket: WebSocket, session: Session):
     """Handles exercise tracking with WebSockets."""
@@ -137,8 +153,12 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
 
     try:
         camera.start_capture()
-        query_string = websocket.scope["query_string"].decode()
-        query_params = dict(param.split("=") for param in query_string.split("&") if "=" in param)
+        query_string = websocket.scope.get("query_string", "").decode()
+
+        try:
+            query_params = dict(param.split("=") for param in query_string.split("&") if "=" in param)
+        except Exception:
+            query_params = {}
 
         print(f"🔹 WebSocket Query Params: {query_params}")
 

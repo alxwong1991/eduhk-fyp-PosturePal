@@ -8,6 +8,7 @@ const useWebsocketStore = create((set) => ({
   exerciseFinished: false,
   isCameraReady: false,
   webSocket: null,
+  resultData: null,
 
   checkCamera: async () => {
     const isReady = await apiCheckCamera();
@@ -42,21 +43,34 @@ const useWebsocketStore = create((set) => ({
         },
         (data) => {
           set({ exerciseFinished: true, webSocket: null });
-          if (onComplete) onComplete(data);
+
+          if (onComplete) {
+            onComplete(data || {}); // ✅ Ensure `onComplete` always gets an object
+          }
         }
       );
-    
+
+      if (!ws) {
+        throw new Error("WebSocket connection failed.");
+      }
+
       set({ webSocket: ws });
-    
+
       ws.onerror = (error) => {
         console.error("WebSocket error:", error);
         set({ exerciseFinished: true, webSocket: null });
-        if (onComplete) onComplete(null);  // ✅ Ensure `onComplete` is called even if there’s an error
+
+        if (onComplete) {
+          onComplete({}); // ✅ Ensure callback always receives an object
+        }
       };
     } catch (error) {
       console.error("Error starting WebSocket exercise:", error);
       set({ exerciseFinished: true });
-      if (onComplete) onComplete(null);  // ✅ Ensure callback is always executed
+
+      if (onComplete) {
+        onComplete({}); // ✅ Ensure callback always receives an object
+      }
     }
   },
 
@@ -68,6 +82,8 @@ const useWebsocketStore = create((set) => ({
       return { webSocket: null, exerciseFinished: true };
     });
   },
+
+  setResultData: (data) => set({ resultData: data }),
 }));
 
 export default useWebsocketStore;

@@ -6,7 +6,7 @@ import useAuthStore from "../stores/authStore";
 import useWebsocketStore from "../stores/websocketStore";
 import { ExerciseLayout, ExerciseButton } from "../components/ExerciseLayout";
 
-export default function Squats() {
+export default function Squats() {  // Change to BicepCurls for that file
   const [difficulty, setDifficulty] = useState(null);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
@@ -18,23 +18,21 @@ export default function Squats() {
     if (!difficulty) return;
 
     setIsExerciseRunning(true);
-    useWebsocketStore.setState({ exerciseFinished: false });
+    useWebsocketStore.setState({ exerciseFinished: false });  // ✅ Reset before starting
     await showCountdown();
     const startTime = Date.now();
 
     try {
       await startWebSocketExercise("squats", difficulty, (totalReps, totalCalories) => {
         setIsExerciseRunning(false);
-        useWebsocketStore.setState({ exerciseFinished: true });
-        const durationMinutes = (Date.now() - startTime) / 60000;
+        useWebsocketStore.setState({ exerciseFinished: false });  // ✅ Reset when navigating
 
-        // ✅ Navigate to the results page
         navigate("/results", {
           state: {
             totalReps,
             exerciseName: "squats",
             totalCaloriesBurned: totalCalories,
-            durationMinutes,
+            durationMinutes: (Date.now() - startTime) / 60000,
             userId: user?.id,
           },
         });
@@ -63,8 +61,8 @@ export default function Squats() {
 
           {!isExerciseRunning && (
             <>
-              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
-                {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
+              <ExerciseButton onClick={startExercise} disabled={isExerciseRunning}>
+                Start Exercise
               </ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>Back to Menu</ExerciseButton>
             </>

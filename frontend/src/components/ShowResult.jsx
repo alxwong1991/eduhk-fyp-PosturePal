@@ -1,6 +1,6 @@
 import useExerciseLogStore from "../stores/exerciseLogStore";
 
-export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurned, durationMinutes, userId }) {
+export default function ShowResult({ totalReps = 0, exerciseName = "Unknown", totalCaloriesBurned = 0, durationMinutes = 0, userId = null }) {
   const { saveLog } = useExerciseLogStore();
 
   async function handleSave() {
@@ -18,10 +18,12 @@ export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurne
     <>
       <p><strong>You completed:</strong> {totalReps} reps</p>
 
-      {userId && totalCaloriesBurned !== undefined && (
+      {/* ✅ Ensure only logged-in users see calories */}
+      {userId && typeof totalCaloriesBurned === "number" && (
         <p><strong>Calories burned:</strong> {totalCaloriesBurned.toFixed(2)} kcal</p>
       )}
 
+      {/* ✅ Ensure only logged-in users see the save button */}
       {userId && (
         <button onClick={handleSave}>Save Workout</button>
       )}
