@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import showResult from "../components/ShowResult";
 import { showCameraError } from "../components/ShowCameraError";
-import { useWebsocket } from "../hooks/useWebsocket";
-import { useAuth } from "../hooks/useAuth";
+import useAuthStore from "../stores/authStore";
+import useWebsocketStore from "../stores/websocketStore";
 import { ExerciseLayout, ExerciseButton } from "../components/ExerciseLayout";
 
 export default function Squats() {
@@ -12,8 +12,8 @@ export default function Squats() {
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
-  const { user } = useAuth();
-  const { image, exerciseFinished, startWebSocketExercise } = useWebsocket();
+  const { user } = useAuthStore();
+  const { image, exerciseFinished, startWebSocketExercise } = useWebsocketStore();
 
   async function startExercise() {
     if (!difficulty) return;

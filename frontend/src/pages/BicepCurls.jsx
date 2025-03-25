@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import showResult from "../components/ShowResult";
 import { showCameraError } from "../components/ShowCameraError";
-import { useWebsocket } from "../hooks/useWebsocket";
-import { useAuth } from "../hooks/useAuth";
+import useAuthStore from "../stores/authStore";
+import useWebsocketStore from "../stores/websocketStore";
 import { ExerciseLayout, ExerciseButton } from "../components/ExerciseLayout";
 
 export default function BicepCurls() {
@@ -12,8 +12,8 @@ export default function BicepCurls() {
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
 
-  const { user } = useAuth(); // ✅ Get user data (can be null for guests)
-  const { image, exerciseFinished, startWebSocketExercise } = useWebsocket();
+  const { user } = useAuthStore(); // ✅ Get user data (can be null for guests)
+  const { image, exerciseFinished, startWebSocketExercise } = useWebsocketStore();
 
   async function startExercise() {
     if (!difficulty) return; // ✅ Allow guests, but difficulty must be selected

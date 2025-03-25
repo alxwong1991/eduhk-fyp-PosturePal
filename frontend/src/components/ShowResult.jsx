@@ -1,8 +1,8 @@
 import Swal from "sweetalert2";
-import { useExerciseLog } from "../hooks/useExerciseLog";
+import useExerciseLogStore from "../stores/exerciseLogStore";
 
 export default function ShowResult({ totalReps, exerciseName, totalCaloriesBurned, durationMinutes, userId }) {
-  const { saveLog } = useExerciseLog();  // ✅ Now it's inside a React component
+  const { saveLog } = useExerciseLogStore();
 
   async function handleSave() {
     if (userId) {
