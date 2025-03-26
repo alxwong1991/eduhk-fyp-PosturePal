@@ -5,6 +5,7 @@ class ExerciseHelper:
     def __init__(self):
         """✅ Store all exercises dynamically in a dictionary."""
         self.exercises = {}
+        self.previous_counter = 0
 
     def setup_exercise(self, exercise_name):
         """✅ Ensure Pose detector is properly reset before starting a new exercise."""

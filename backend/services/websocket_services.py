@@ -44,18 +44,20 @@ async def send_countdown(websocket):
         await websocket.send_json({"event": "display_countdown", "countdown": i})
         await asyncio.sleep(1)
 
+import json  # ✅ Import JSON module for pretty printing
+
 async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, user, total_calories_burned, start_time):
-    """Process a frame, track exercise, and send feedback."""
+    """Process a frame, track reps, and update calories based on completed reps."""
     try:
-        frame, angle, counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
+        frame, angle, new_counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
     except Exception as e:
         print(f"❌ Error in perform_exercise: {e}")
         await websocket.send_json({"error": "Failed to process exercise data"})
         return None, None, None, True
 
     elapsed_time = asyncio.get_event_loop().time() - start_time
-    duration_seconds = round(elapsed_time, 2)  # ✅ Keep in seconds
-    duration_minutes = round(duration_seconds / 60, 2)  # ✅ Convert to minutes only for logging
+    duration_seconds = round(elapsed_time, 2)
+    duration_minutes = round(duration_seconds / 60, 2)
 
     print(f"⏳ Elapsed Time: {duration_seconds} sec ({duration_minutes} min)")
 
@@ -68,10 +70,13 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
 
     print(f"🔍 Using Weight: {weight_kg} kg for calorie calculation")
 
-    # ✅ Calculate calories burned correctly
-    calories_burned = calculate_calories_burned(weight_kg, exercise, duration_seconds)
-    total_calories_burned += calories_burned  # ✅ Accumulate calories instead of overwriting
-    print(f"🔥 Calories Burned: {calories_burned:.2f} kcal (Total: {total_calories_burned:.2f} kcal)")
+    # ✅ Track calories ONLY when a rep is completed
+    calories_per_rep = calculate_calories_burned(weight_kg, exercise, 3)  # Assume each rep takes ~3s
+    if new_counter > exercise_helper.previous_counter:  # ✅ Check if a new rep is completed
+        total_calories_burned += calories_per_rep
+
+    # ✅ Update the counter (store last rep count to detect new reps)
+    exercise_helper.previous_counter = new_counter  
 
     _, buffer = cv2.imencode(".jpg", frame)
     base64_frame = base64.b64encode(buffer).decode("utf-8")
@@ -79,14 +84,22 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
     response_data = {
         "event": "update_frame",
         "image": base64_frame,
-        "counter": counter,
-        "durationSeconds": duration_seconds,  # ✅ Logging only (not used for calculation)
-        "totalCaloriesBurned": round(total_calories_burned, 2)  # ✅ Ensure correct rounding
+        "counter": new_counter,
+        "durationMinutes": duration_minutes,
+        "totalCaloriesBurned": round(total_calories_burned, 2)
     }
+
+    # ✅ Create a copy without the "image" key for debugging
+    response_data_debug = response_data.copy()
+    response_data_debug.pop("image", None)  # ✅ Remove "image" for logging
+
+    # ✅ Pretty print response (without image)
+    print("📊 **Formatted Response Data (Without Image):**")
+    print(json.dumps(response_data_debug, indent=4))  # ✅ Clean output
 
     await websocket.send_json(response_data)
 
-    return counter, total_calories_burned, time_up, False
+    return new_counter, total_calories_burned, time_up, False
 
 async def save_exercise_log(session, user, exercise, counter, total_calories_burned, duration_seconds):
     """Save the exercise log to the database for logged-in users."""
@@ -130,14 +143,21 @@ async def start_exercise_session(websocket, session, camera, exercise_helper, ex
             elapsed_time = asyncio.get_event_loop().time() - start_time
             duration_minutes = round(elapsed_time / 60, 2)
 
-            await websocket.send_json({
+            # ✅ Ensure the correct data is sent
+            response_data = {
                 "event": "exercise_complete",
                 "message": "Workout complete!",
-                "total_reps": counter,
-                "total_calories_burned": round(total_calories_burned, 2) if user else None,
+                "totalReps": counter,
+                "totalCaloriesBurned": round(total_calories_burned, 2),  # ✅ Ensure correct calories
                 "durationMinutes": duration_minutes,
-                "user_id": user.id if user else None
-            })
+                "userId": user.id if user else None
+            }
+
+            # ✅ Debugging log
+            print("📊 **Final Response Data Sent to Frontend:**")
+            print(json.dumps(response_data, indent=4))  # ✅ Ensure correct values are sent
+
+            await websocket.send_json(response_data)
             break
 
         await asyncio.sleep(0.1)

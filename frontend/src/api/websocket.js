@@ -46,14 +46,14 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
 
           // ✅ Ensure only valid data is passed
           const resultData = {
-            totalReps: data.total_reps ?? 0,
-            totalCaloriesBurned: data.total_calories_burned ?? 0,
-            userId: data.user_id ?? null,
-            exerciseName: exerciseType, // ✅ Ensure exercise name is included
-            durationMinutes: data.duration_minutes ?? 0, // ✅ Ensure duration is included
+            totalReps: data.totalReps ?? 0,  // ✅ Fix variable name to match backend
+            totalCaloriesBurned: data.totalCaloriesBurned ?? 0,  // ✅ Fix variable name
+            userId: data.userId ?? null,  // ✅ Fix variable name
+            exerciseName: exerciseType,  // ✅ Ensure exercise name is included
+            durationMinutes: data.durationMinutes ?? 0,  // ✅ Fix variable name
           };
 
-          console.log(resultData, "hihihi");
+          console.log("🟢 **Frontend Received Final Data:**", resultData);
           if (onComplete) onComplete(resultData);
         }
       } catch (error) {

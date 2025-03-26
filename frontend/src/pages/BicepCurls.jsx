@@ -63,7 +63,7 @@ export default function BicepCurls() {
 
           {!isExerciseRunning && (
             <>
-              <ExerciseButton onClick={startExercise} disabled={exerciseFinished}>
+              <ExerciseButton onClick={startExercise}>
                 {exerciseFinished ? "Exercise Complete" : "Start Exercise"}
               </ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>Back to Menu</ExerciseButton>
