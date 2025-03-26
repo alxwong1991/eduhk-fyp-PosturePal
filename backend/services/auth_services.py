@@ -1,6 +1,6 @@
 import re
 from fastapi import HTTPException, Depends
-from sqlmodel import Session, select
+from sqlmodel import select
 from database import get_session
 from models.user import User
 from utils.security import hash_password, verify_password, create_access_token, verify_access_token
@@ -9,6 +9,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+
+async def get_user(session: AsyncSession, user_id: int):
+    """Fetch user details from the database with error handling."""
+    try:
+        result = await session.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
+
+        if not user:
+            return None, "User not found"
+
+        return user, None  # ✅ Return a tuple (user, error)
+    except Exception as e:
+        return None, f"Database error: {str(e)}"
 
 async def register_user_service(user_data, session: AsyncSession):
     """Register a new user with hashed password."""
@@ -54,15 +67,13 @@ async def get_current_user_service(token: str = Depends(oauth2_scheme), session:
     try:
         payload = verify_access_token(token)
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))
+        return None, str(e)  # ✅ Return a tuple (None, error message)
 
-    result = await session.execute(select(User).where(User.email == payload["email"]))
-    user = result.scalar_one_or_none()  # ✅ Use `.scalar_one_or_none()`
+    user_id = payload.get("user_id")
+    if not user_id:
+        return None, "Invalid token payload"
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return user
+    return await get_user(session, user_id)  # ✅ This now returns (User, None) or (None, "error message")
 
 async def logout_user_service(user):
     """Logs out the user by clearing session/token (if applicable)."""

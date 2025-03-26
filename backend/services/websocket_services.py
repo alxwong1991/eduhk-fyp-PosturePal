@@ -2,14 +2,12 @@ import asyncio
 import base64
 import cv2
 from fastapi import WebSocket, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session
 from modules.camera import Camera
 from modules.exercise_helper import ExerciseHelper
 from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
 from modules.calorie_tracker import calculate_calories_burned
-from models.user import User
-from models.exercise_log import ExerciseLog
-from datetime import datetime, timezone
+from services.auth_services import get_user
 
 async def check_camera_service():
     """Check if camera is available and working."""
@@ -25,27 +23,6 @@ async def check_camera_service():
         return {"status": "ok", "message": "Camera is working"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to access camera: {str(e)}")
-
-async def get_user(session, user_id):
-    """Fetch user details from the database with improved validation."""
-    if user_id:
-        try:
-            print(f"🔍 Fetching user with ID: {user_id}")
-            result = await session.execute(select(User).where(User.id == int(user_id)))
-            user = result.scalar_one_or_none() 
-
-            if not user:
-                print("❌ ERROR: User not found in the database.")
-                return None, "User not found"
-
-            print(f"✅ User retrieved: {user.name}, ID: {user.id}, Weight: {user.weight_kg} kg")
-            return user, None
-        except (ValueError, TypeError):
-            print("❌ ERROR: Invalid user_id format.")
-            return None, "Invalid user_id format"
-
-    print("⚠️ No user ID provided, proceeding as guest.")
-    return None, None
 
 async def send_countdown(websocket):
     """Send a countdown before starting the exercise."""
@@ -110,20 +87,6 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
 
     return new_counter, total_calories_burned, time_up, False
 
-async def save_exercise_log(session, user, exercise, counter, total_calories_burned, duration_seconds):
-    """Save the exercise log to the database for logged-in users."""
-    new_exercise_log = ExerciseLog(
-        user_id=user.id,
-        exercise_name=exercise,
-        total_reps=counter,
-        calories_burned=round(total_calories_burned, 2),
-        duration_minutes=round(duration_seconds / 60, 2),  # ✅ Convert seconds to minutes
-        exercise_date=datetime.now(timezone.utc),
-    )
-    user.daily_calories_burned += total_calories_burned
-    session.add(new_exercise_log)
-    session.commit()
-
 async def start_exercise_session(websocket, session, camera, exercise_helper, exercise, difficulty, user):
     """Handles the exercise session with WebSocket communication."""
     exercise_helper.setup_exercise(exercise)
@@ -171,9 +134,6 @@ async def start_exercise_session(websocket, session, camera, exercise_helper, ex
 
         await asyncio.sleep(0.1)
 
-    if user:
-        await save_exercise_log(session, user, exercise, counter, total_calories_burned, elapsed_time)
-
 async def handle_exercise_websocket(websocket: WebSocket, session: Session):
     """Handles exercise tracking with WebSockets."""
     await websocket.accept()
@@ -195,8 +155,12 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
         difficulty = query_params.get("difficulty", DEFAULT_DIFFICULTY)
         user_id = query_params.get("user_id")
 
-        # ✅ Improved logging to check user retrieval
-        print(f"🔍 Attempting to fetch user with ID: {user_id}")
+        if user_id is not None:
+            try:
+                user_id = int(user_id)  # ✅ Convert to integer
+            except ValueError:
+                await websocket.send_json({"error": "Invalid user_id format. Must be an integer."})
+                return
 
         user, error = await get_user(session, user_id)
         if error:

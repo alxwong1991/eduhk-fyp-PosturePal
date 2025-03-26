@@ -8,7 +8,7 @@ if (!API_BASE_URL) {
 
 // ✅ Helper function to get the token from localStorage
 function getAuthToken() {
-  return localStorage.getItem("access_token");
+  return localStorage.getItem("access_token") || null;
 }
 
 // ✅ Register User
@@ -60,7 +60,6 @@ export async function getUserProfile() {
     throw new Error(error.response?.data?.detail || "Failed to fetch profile");
   }
 }
-
 // ✅ Logout User (Clear Token)
 export function logoutUser() {
   localStorage.removeItem("access_token"); // ✅ Remove JWT token

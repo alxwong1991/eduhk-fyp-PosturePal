@@ -6,6 +6,8 @@ export async function ShowFinishExercise(navigate, resultData) {
     text: "Great job! Your workout has been recorded.",
     icon: "success",
     confirmButtonText: "View Results",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
   }).then((result) => {
     if (result.isConfirmed) {
       navigate("/result", { state: resultData });

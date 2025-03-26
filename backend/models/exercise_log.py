@@ -14,4 +14,4 @@ class ExerciseLog(SQLModel, table=True):
     exercise_date: datetime = Field(default_factory=datetime.utcnow)
 
     # ✅ Use forward reference "User" (string) to prevent circular import
-    user: Optional["User"] = Relationship(back_populates="exercises")
+    user: Optional["User"] = Relationship(back_populates="exercise_logs")  # ✅ Fixed relationship name
