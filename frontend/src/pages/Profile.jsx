@@ -1,5 +1,7 @@
 import useAuthStore from "../stores/authStore";
 import NavMenu from "../components/NavMenu";
+import ShowExerciseLog from "../components/ShowExerciseLog";
+import ShowGoalTracker from "../components/ShowGoalTracker"; 
 import {
   Container,
   ProfileCard,
@@ -8,7 +10,7 @@ import {
   Label,
   Value,
   Section,
-  Placeholder,
+  SectionHeader,
 } from "../styles/pages/ProfileStyles";
 
 export default function Profile() {
@@ -25,7 +27,10 @@ export default function Profile() {
   return (
     <Container>
       <NavMenu />
+      <ShowGoalTracker />
       <Section>
+        {/* ✅ Profile Section */}
+        <SectionHeader>Profile Information</SectionHeader>
         <ProfileCard>
           <ProfileImage>
             {user.gender === "Male" ? "👨" : user.gender === "Female" ? "👩" : "👤"}
@@ -53,7 +58,9 @@ export default function Profile() {
           </Info>
         </ProfileCard>
 
-        <Placeholder>🚀 Future Feature: Exercise Log History</Placeholder>
+        {/* ✅ Exercise Log Section */}
+        <SectionHeader>Exercise Log History</SectionHeader>
+        <ShowExerciseLog />
       </Section>
     </Container>
   );

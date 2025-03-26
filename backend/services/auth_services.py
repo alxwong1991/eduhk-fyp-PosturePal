@@ -10,18 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
-async def get_user(session: AsyncSession, user_id: int):
-    """Fetch user details from the database with error handling."""
+async def get_user(session: AsyncSession, user_id: int) -> User | None:
+    """Fetch user details from the database."""
     try:
         result = await session.execute(select(User).where(User.id == user_id))
-        user = result.scalar_one_or_none()
-
-        if not user:
-            return None, "User not found"
-
-        return user, None  # ✅ Return a tuple (user, error)
+        return result.scalar_one_or_none()  # ✅ Return `User` or `None`
     except Exception as e:
-        return None, f"Database error: {str(e)}"
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")  # ✅ Raise exception for DB errors
 
 async def register_user_service(user_data, session: AsyncSession):
     """Register a new user with hashed password."""
@@ -62,18 +57,25 @@ async def login_user_service(login_data, session: AsyncSession):
     access_token = create_access_token({"user_id": user.id, "email": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
-async def get_current_user_service(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)):
-    """Get current logged-in user from JWT token."""
+async def get_current_user_service(
+    token: str = Depends(oauth2_scheme), 
+    session: AsyncSession = Depends(get_session)
+) -> User:
+    """Get the current logged-in user from JWT token."""
     try:
         payload = verify_access_token(token)
     except ValueError as e:
-        return None, str(e)  # ✅ Return a tuple (None, error message)
+        raise HTTPException(status_code=401, detail=str(e))  # ✅ Raise an exception instead of returning a tuple
 
     user_id = payload.get("user_id")
     if not user_id:
-        return None, "Invalid token payload"
+        raise HTTPException(status_code=401, detail="Invalid token payload")  # ✅ Return error properly
 
-    return await get_user(session, user_id)  # ✅ This now returns (User, None) or (None, "error message")
+    user = await get_user(session, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")  # ✅ Raise an exception if the user is missing
+
+    return user  # ✅ Return a single `User` object
 
 async def logout_user_service(user):
     """Logs out the user by clearing session/token (if applicable)."""

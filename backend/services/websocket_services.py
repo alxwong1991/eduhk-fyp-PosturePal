@@ -162,11 +162,14 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
                 await websocket.send_json({"error": "Invalid user_id format. Must be an integer."})
                 return
 
-        user, error = await get_user(session, user_id)
-        if error:
-            print(f"❌ Error fetching user: {error}")
-            await websocket.send_json({"error": error})
+        user = await get_user(session, user_id)  # ✅ Now `get_user()` returns only `User` or `None`
+
+        if user is None:  # ✅ Handle the case where the user is not found
+            print("❌ Error fetching user: User not found")
+            await websocket.send_json({"error": "User not found"})
             return
+
+        print(f"✅ User found: {user.name}, ID: {user.id}")
 
         if user:
             print(f"✅ User found: {user.name}, ID: {user.id}")

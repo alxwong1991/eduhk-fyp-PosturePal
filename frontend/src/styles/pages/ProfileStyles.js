@@ -18,8 +18,16 @@ export const Section = styled.div`
   margin-top: 20px;
 `;
 
+export const SectionHeader = styled.h2`
+  color: white;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+`;
+
 export const ProfileCard = styled.div`
-  background: rgba(255, 255, 255, 0.15); /* ✅ Glassmorphism effect */
+  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   padding: 30px;
   border-radius: 15px;
@@ -40,7 +48,7 @@ export const Info = styled.div`
   justify-content: space-between;
   padding: 12px;
   font-size: 1.1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* ✅ Subtle dividers */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   
   &:last-child {
     border-bottom: none;
@@ -54,19 +62,4 @@ export const Label = styled.span`
 
 export const Value = styled.span`
   color: #f0f0f0;
-`;
-
-export const Placeholder = styled.div`
-  margin-top: 20px;
-  width: 100%;
-  height: 200px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  color: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  backdrop-filter: blur(10px);
 `;

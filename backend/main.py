@@ -29,8 +29,7 @@ app = FastAPI(title="PosturePal API", description="Backend for PosturePal", life
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=FRONTEND_ORIGINS,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=FRONTEND_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
