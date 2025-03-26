@@ -10,7 +10,7 @@ load_dotenv()
 # ✅ Secure JWT settings
 SECRET_KEY = os.getenv("SECRET_KEY")  # Use a strong, secret key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # Token expires in 30 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = 60  # Token expires in 60 minutes
 
 # ✅ Password Hashing Functions
 def hash_password(password: str) -> str:

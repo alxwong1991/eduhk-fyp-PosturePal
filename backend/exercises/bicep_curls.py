@@ -16,7 +16,7 @@ class BicepCurls:
         self.max_reps = DIFFICULTY_LEVELS.get("bicep_curls", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # ✅ Timer setup
-        self.timer = 20
+        self.timer = 10
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 
@@ -108,7 +108,7 @@ class BicepCurls:
 
         return self.counter, arm_color
 
-    def perform_exercise(self, frame, max_reps):
+    def perform_exercise(self, frame, max_reps, calories_burned=0):
         """✅ Process frame and track bicep curls exercise with correct posture check."""
         if not self.timer_started:
             self.timer_instance = CountdownTimer(self.timer)
@@ -152,7 +152,7 @@ class BicepCurls:
             # ✅ Ensure feedback message is displayed **AFTER** all drawings
             self.ui_renderer.display_feedback_message(image, self.feedback_message, arm_color)
 
-            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
+            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time, calories_burned)
 
             # ✅ Draw pose landmarks
             mp_drawing.draw_landmarks(

@@ -3,7 +3,6 @@ from typing import Optional, List
 from pydantic import EmailStr
 import bcrypt
 from datetime import date, datetime
-from models.exercise_log import ExerciseLog
 
 class User(SQLModel, table=True):
     """✅ User model with relationship to ExerciseLog."""
@@ -18,8 +17,8 @@ class User(SQLModel, table=True):
     weight_kg: float
     daily_calories_burned: float = Field(default=0)
 
-    # ✅ Use forward reference "ExerciseLog" (string)
-    exercises: List["ExerciseLog"] = Relationship(back_populates="user")
+    # ✅ Use forward reference "ExerciseLog" (string) to prevent circular import
+    exercise_logs: List["ExerciseLog"] = Relationship(back_populates="user")
 
     def calculate_age(self) -> int:
         """✅ Dynamically calculate age from stored DOB."""
@@ -28,7 +27,9 @@ class User(SQLModel, table=True):
         return age
 
     def verify_password(self, password: str) -> bool:
+        """✅ Verify hashed password."""
         return bcrypt.checkpw(password.encode(), self.password_hash.encode())
 
 def hash_password(password: str) -> str:
+    """✅ Hash a password before storing it."""
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()

@@ -71,7 +71,7 @@ class Squats:
 
         return self.counter
 
-    def perform_exercise(self, frame, max_reps):
+    def perform_exercise(self, frame, max_reps, calories_burned=0):
         """Process frame and track squats exercise."""
         if not self.timer_started:
             self.timer_instance = CountdownTimer(self.timer)
@@ -110,7 +110,7 @@ class Squats:
             self.ui_renderer.provide_feedback(landmarks, image, "squats", squat_angle=angle)
             self.ui_renderer.draw_progress_bar(image, self.counter, max_reps, "squats")
             
-            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
+            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time, calories_burned)
 
             # Draw pose landmarks
             mp_drawing.draw_landmarks(

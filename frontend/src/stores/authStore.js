@@ -1,54 +1,85 @@
 import { create } from "zustand";
 import { loginUser, registerUser, getUserProfile, logoutUser } from "../api/auth";
+import { jwtDecode } from "jwt-decode";
 
-const useAuthStore = create((set) => ({
-  user: null,
+// ✅ Safely parse JSON from localStorage
+const getStoredUser = () => {
+  try {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    return null;
+  }
+};
+
+const useAuthStore = create((set, get) => ({
+  user: getStoredUser(),
   token: localStorage.getItem("access_token") || null,
   loading: true,
   sessionExpired: false,
 
-  // ✅ Fetch user profile
-  fetchUser: async () => {
+  // ✅ Check if token is expired
+  isTokenExpired: () => {
     const token = localStorage.getItem("access_token");
-    if (!token) {
-      set({ user: null, loading: false });
+    if (!token) return true;
+
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.exp * 1000 < Date.now();
+    } catch {
+      return true;
+    }
+  },
+
+  // ✅ Fetch user profile & handle expired token
+  fetchUser: async () => {
+    if (get().isTokenExpired()) {
+      get().handleSessionExpiration();
       return;
     }
 
     try {
       const userData = await getUserProfile();
+      localStorage.setItem("user", JSON.stringify(userData));
       set({ user: userData, sessionExpired: false });
     } catch (error) {
       if (error.message === "Session expired") {
-        set({ user: null, sessionExpired: true });
-        logoutUser();
+        get().handleSessionExpiration();
       }
     } finally {
       set({ loading: false });
     }
   },
 
-  // ✅ Handle login
+  // ✅ Handle login & persist token
   login: async (credentials) => {
     const data = await loginUser(credentials);
-    localStorage.setItem("access_token", data.access_token); // ✅ Store token
-    await useAuthStore.getState().fetchUser(); // ✅ Fetch user data after login
-    set({ sessionExpired: false });
+    localStorage.setItem("access_token", data.access_token);
+    await get().fetchUser();
+    set({ token: data.access_token, sessionExpired: false });
   },
 
-  // ✅ Fix: Implement register function
+  // ✅ Handle user registration
   register: async (userData) => {
-    await registerUser(userData); // 🔹 Call registerUser function
+    await registerUser(userData);
   },
 
-  // ✅ Handle logout
+  // ✅ Handle logout & clear storage
   logout: () => {
     logoutUser();
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
     set({ user: null, token: null, sessionExpired: false });
   },
 
-  // ✅ Handle session expiration
-  setSessionExpired: (expired) => set({ sessionExpired: expired }),
+  // ✅ Prevent session expiration from looping
+  handleSessionExpiration: () => {
+    if (get().sessionExpired) return;
+
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    set({ user: null, token: null, sessionExpired: true });
+  },
 }));
 
 export default useAuthStore;

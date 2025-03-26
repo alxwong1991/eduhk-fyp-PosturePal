@@ -1,24 +1,23 @@
+import asyncio
 import cv2
 from modules.camera import Camera
 
 camera = Camera()
 streaming_active = False  # ✅ Streaming state
 
-def generate_frames_service():
-    """Continuously capture frames and serve as MJPEG stream."""
+async def generate_frames_service():
+    """Asynchronous video frame generator."""
     global streaming_active
     camera.start_capture()
 
     while streaming_active:
+        await asyncio.sleep(0.01)  # ✅ Allow async event loop to run
         ret, frame = camera.read_frame()
         if not ret:
             break
 
         _, buffer = cv2.imencode('.jpg', frame)
-        yield (
-            b'--frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n'
-        )
+        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
 
     camera.release_capture()
 

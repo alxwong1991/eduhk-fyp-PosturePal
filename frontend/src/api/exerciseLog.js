@@ -15,23 +15,23 @@ export async function saveExerciseLog(userId, exerciseName, totalReps, totalCalo
       throw new Error("User is not authenticated.");
     }
 
-    const response = await axios.post(
-      `${API_BASE_URL}/exercise/log`, 
-      {
-        user_id: userId,
-        exercise_name: exerciseName,
-        total_reps: totalReps,
-        calories_burned: totalCalories,
-        duration_minutes: durationMinutes
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
+    const requestData = {
+      user_id: userId,
+      exercise_name: exerciseName,
+      total_reps: totalReps,
+      calories_burned: totalCalories,
+      duration_minutes: durationMinutes, // ✅ Ensure this is always present
+    };
+
+    console.log("📤 Sending Exercise Log Data:", requestData);
+
+    const response = await axios.post(`${API_BASE_URL}/exercise/log`, requestData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     return response.data;
   } catch (error) {
-    console.error("Failed to save exercise log:", error.response?.data?.detail || error.message);
+    console.error("❌ Failed to save exercise log:", error.response?.data?.detail || error.message);
     throw new Error(error.response?.data?.detail || "Failed to save exercise log");
   }
 }

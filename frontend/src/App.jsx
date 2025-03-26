@@ -1,40 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import useAuthStore from "./stores/authStore";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import GlobalSessionAlert from "./components/GlobalSessionAlert";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import BicepCurls from "./pages/BicepCurls";
 import Squats from "./pages/Squats";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
-function GlobalSessionAlert() {
-  const navigate = useNavigate();
-  const { sessionExpired, loading, setSessionExpired } = useAuthStore();
-  const [alertShown, setAlertShown] = useState(false); // ✅ Track if alert has been shown
-
-  useEffect(() => {
-    if (!loading && sessionExpired && !alertShown) { // ✅ Prevent multiple alerts
-      setAlertShown(true); // ✅ Mark alert as shown
-
-      Swal.fire({
-        title: "Session Expired",
-        text: "Your session has expired. Please log in again.",
-        icon: "warning",
-        confirmButtonText: "OK",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      }).then(() => {
-        setSessionExpired(false); // ✅ Reset session state
-        setAlertShown(false); // ✅ Allow future alerts after login
-        navigate("/login");
-      });
-    }
-  }, [sessionExpired, loading, alertShown, navigate, setSessionExpired]);
-
-  return null;
-}
+import Result from "./pages/Result";
 
 export default function App() {
   return (
@@ -48,6 +20,7 @@ export default function App() {
         <Route path="/squats" element={<Squats />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/result" element={<Result />} />
       </Routes>
     </Router>
   );
