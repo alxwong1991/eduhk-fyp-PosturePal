@@ -2,39 +2,38 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showCountdown } from "../components/ShowCountdown";
 import { showCameraError } from "../components/ShowCameraError";
+import { ShowFinishExercise } from "../components/ShowFinishExercise";
 import useAuthStore from "../stores/authStore";
 import useWebsocketStore from "../stores/websocketStore";
 import { ExerciseLayout, ExerciseButton } from "../components/ExerciseLayout";
 
-export default function Squats() {  // Change to BicepCurls for that file
+export default function Squats() {
   const [difficulty, setDifficulty] = useState(null);
   const [isExerciseRunning, setIsExerciseRunning] = useState(false);
   const navigate = useNavigate();
-
   const { user } = useAuthStore();
-  const { image, exerciseFinished, startWebSocketExercise } = useWebsocketStore();
+  const { image, startWebSocketExercise, resetWebSocketState } = useWebsocketStore();
 
   async function startExercise() {
     if (!difficulty) return;
 
+    resetWebSocketState();
     setIsExerciseRunning(true);
-    useWebsocketStore.setState({ exerciseFinished: false });  // ✅ Reset before starting
+    useWebsocketStore.setState({ exerciseFinished: false }); // ✅ Reset WebSocket state
     await showCountdown();
     const startTime = Date.now();
 
     try {
       await startWebSocketExercise("squats", difficulty, (totalReps, totalCalories) => {
         setIsExerciseRunning(false);
-        useWebsocketStore.setState({ exerciseFinished: false });  // ✅ Reset when navigating
+        const durationMinutes = (Date.now() - startTime) / 60000;
 
-        navigate("/results", {
-          state: {
-            totalReps,
-            exerciseName: "squats",
-            totalCaloriesBurned: totalCalories,
-            durationMinutes: (Date.now() - startTime) / 60000,
-            userId: user?.id,
-          },
+        ShowFinishExercise(navigate, {
+          totalReps,
+          exerciseName: "squats",
+          totalCaloriesBurned: totalCalories,
+          durationMinutes,
+          userId: user?.id,
         });
       });
     } catch (error) {
@@ -45,7 +44,7 @@ export default function Squats() {  // Change to BicepCurls for that file
   }
 
   return (
-    <ExerciseLayout title="Squats" image={image} isActive={!exerciseFinished && isExerciseRunning}>
+    <ExerciseLayout title="Squats" image={image} isActive={isExerciseRunning}>
       {!difficulty && (
         <>
           <h3>Select Difficulty:</h3>
@@ -58,12 +57,9 @@ export default function Squats() {  // Change to BicepCurls for that file
       {difficulty && (
         <>
           <h2>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</h2>
-
           {!isExerciseRunning && (
             <>
-              <ExerciseButton onClick={startExercise} disabled={isExerciseRunning}>
-                Start Exercise
-              </ExerciseButton>
+              <ExerciseButton onClick={startExercise}>Start Exercise</ExerciseButton>
               <ExerciseButton onClick={() => navigate("/dashboard")}>Back to Menu</ExerciseButton>
             </>
           )}

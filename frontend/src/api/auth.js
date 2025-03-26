@@ -26,6 +26,11 @@ export async function loginUser(credentials) {
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
     localStorage.setItem("access_token", response.data.access_token); // ✅ Store JWT token
+
+    // ✅ Fetch user profile after login and store user_id
+    const userProfile = await getUserProfile();
+    localStorage.setItem("user_id", userProfile.id);
+
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.detail || "Invalid credentials");

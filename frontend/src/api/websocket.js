@@ -20,7 +20,9 @@ export async function checkCamera() {
 
 export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onComplete) {
   try {
-    const userId = localStorage.getItem("user_id"); // ✅ Get user ID if logged in
+    const userId = localStorage.getItem("user_id"); // ✅ Get user ID from local storage
+    console.log("🔹 Retrieved user ID from localStorage:", userId);
+
     const wsUrl = userId
       ? `${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}&user_id=${userId}`
       : `${WEBSOCKET_URL}/ws/start_exercise?exercise=${exerciseType}&difficulty=${difficulty}`;
@@ -46,14 +48,14 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
 
           // ✅ Ensure only valid data is passed
           const resultData = {
-            totalReps: data.totalReps ?? 0,  // ✅ Fix variable name to match backend
-            totalCaloriesBurned: data.totalCaloriesBurned ?? 0,  // ✅ Fix variable name
-            userId: data.userId ?? null,  // ✅ Fix variable name
-            exerciseName: exerciseType,  // ✅ Ensure exercise name is included
-            durationMinutes: data.durationMinutes ?? 0,  // ✅ Fix variable name
+            totalReps: data.totalReps ?? 0,
+            totalCaloriesBurned: data.totalCaloriesBurned ?? 0,
+            userId: data.userId,  // ✅ Ensure correct userId is passed
+            exerciseName: exerciseType,
+            durationMinutes: data.durationMinutes ?? 0,
           };
 
-          console.log("🟢 **Frontend Received Final Data:**", resultData);
+          // console.log("🟢 **Frontend Received Final Data:**", resultData);
           if (onComplete) onComplete(resultData);
         }
       } catch (error) {

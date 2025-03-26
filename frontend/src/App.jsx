@@ -49,7 +49,7 @@ export default function App() {
         <Route path="/squats" element={<Squats />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/results" element={<Result />} />
+        <Route path="/result" element={<Result />} />
       </Routes>
     </Router>
   );

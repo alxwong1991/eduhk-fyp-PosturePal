@@ -27,15 +27,24 @@ async def check_camera_service():
         raise HTTPException(status_code=400, detail=f"Failed to access camera: {str(e)}")
 
 async def get_user(session, user_id):
-    """Fetch user details from the database."""
+    """Fetch user details from the database with improved validation."""
     if user_id:
         try:
-            user = session.exec(select(User).where(User.id == int(user_id))).first()
+            print(f"🔍 Fetching user with ID: {user_id}")
+            result = await session.execute(select(User).where(User.id == int(user_id)))
+            user = result.scalar_one_or_none() 
+
             if not user:
+                print("❌ ERROR: User not found in the database.")
                 return None, "User not found"
+
+            print(f"✅ User retrieved: {user.name}, ID: {user.id}, Weight: {user.weight_kg} kg")
             return user, None
-        except ValueError:
+        except (ValueError, TypeError):
+            print("❌ ERROR: Invalid user_id format.")
             return None, "Invalid user_id format"
+
+    print("⚠️ No user ID provided, proceeding as guest.")
     return None, None
 
 async def send_countdown(websocket):
@@ -186,15 +195,24 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
         difficulty = query_params.get("difficulty", DEFAULT_DIFFICULTY)
         user_id = query_params.get("user_id")
 
+        # ✅ Improved logging to check user retrieval
+        print(f"🔍 Attempting to fetch user with ID: {user_id}")
+
         user, error = await get_user(session, user_id)
         if error:
+            print(f"❌ Error fetching user: {error}")
             await websocket.send_json({"error": error})
             return
+
+        if user:
+            print(f"✅ User found: {user.name}, ID: {user.id}")
+        else:
+            print("⚠️ No user found, proceeding as guest.")
 
         await start_exercise_session(websocket, session, camera, exercise_helper, exercise, difficulty, user)
 
     except Exception as e:
-        print(f"WebSocket Error: {e}")
+        print(f"❌ WebSocket Error: {e}")
     finally:
         camera.release_capture()
         await websocket.close()

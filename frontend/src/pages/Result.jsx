@@ -1,39 +1,57 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ShowResult from "../components/ShowResult";
-import { ResultContainer, ResultCard, ResultText, ActionButton } from "../styles/pages/ResultStyles";
+import { ResultPageContainer, ResultCard } from "../styles/pages/ResultStyles";
 import useWebsocketStore from "../stores/websocketStore";
 
 export default function Result() {
-  const navigate = useNavigate();
   const { resultData } = useWebsocketStore();
+  const [loading, setLoading] = useState(true);
 
-  if (!resultData || typeof resultData !== "object") {
+  useEffect(() => {
+    if (resultData && typeof resultData === "object" && Object.keys(resultData).length > 0) {
+      setLoading(false);
+    }
+  }, [resultData]);
+
+  if (loading) {
     return (
-      <ResultContainer>
+      <ResultPageContainer>
         <ResultCard>
-          <ResultText>No results available.</ResultText>
-          <ActionButton onClick={() => navigate("/dashboard")}>Back to Dashboard</ActionButton>
+          <p><strong>Loading results...</strong></p>
         </ResultCard>
-      </ResultContainer>
+      </ResultPageContainer>
     );
   }
 
-  // ✅ Extract values safely
-  const { totalReps = 0, exerciseName = "Unknown", totalCaloriesBurned = 0, durationMinutes = 0, userId = null } = resultData;
+  if (!resultData || Object.keys(resultData).length === 0) {
+    return (
+      <ResultPageContainer>
+        <ResultCard>
+          <p><strong>No results available.</strong></p>
+        </ResultCard>
+      </ResultPageContainer>
+    );
+  }
+
+  const {
+    totalReps = 0,
+    exerciseName = "Unknown",
+    totalCaloriesBurned = 0,
+    durationMinutes = 0,
+    userId = null,
+  } = resultData;
 
   return (
-    <ResultContainer>
+    <ResultPageContainer>
       <ResultCard>
-        <ShowResult 
+        <ShowResult
           totalReps={totalReps}
           exerciseName={exerciseName}
           totalCaloriesBurned={totalCaloriesBurned}
           durationMinutes={durationMinutes}
           userId={userId}
         />
-        {/* <ShowResult {...resultData} /> */}
-        <ActionButton onClick={() => navigate("/dashboard")}>Back to Dashboard</ActionButton>
       </ResultCard>
-    </ResultContainer>
+    </ResultPageContainer>
   );
 }

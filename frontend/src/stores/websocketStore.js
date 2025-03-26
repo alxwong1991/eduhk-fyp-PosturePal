@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { checkCamera as apiCheckCamera, createExerciseWebSocket } from "../api/websocket";
 
-const useWebsocketStore = create((set) => ({
-  image: "",
+const useWebsocketStore = create((set, get) => ({
+  image: null,
   counter: 0,
-  calories: null, // ✅ Only available for logged-in users
+  calories: null,
   exerciseFinished: false,
   isCameraReady: false,
   webSocket: null,
@@ -17,18 +17,13 @@ const useWebsocketStore = create((set) => ({
   },
 
   startWebSocketExercise: async (exerciseType, difficulty, onComplete) => {
-    set({ counter: 0, calories: null, image: "", exerciseFinished: false });
+    set({ resultData: null, image: null, counter: 0, calories: null, exerciseFinished: false });
 
     const cameraReady = await apiCheckCamera();
     if (!cameraReady) {
-      console.error("Camera is not ready, aborting exercise.");
+      console.error("❌ Camera is not ready, aborting exercise.");
       return;
     }
-
-    set((state) => {
-      if (state.webSocket) state.webSocket.close(); // Close existing WebSocket
-      return { webSocket: null };
-    });
 
     try {
       const ws = createExerciseWebSocket(
@@ -36,54 +31,48 @@ const useWebsocketStore = create((set) => ({
         difficulty,
         (newImage, newCounter, newCalories) => {
           set({
-            image: `data:image/jpeg;base64,${newImage}`,
+            image: newImage ? `data:image/jpeg;base64,${newImage}` : null,
             counter: newCounter,
             calories: newCalories ?? null,
           });
         },
         (data) => {
-          set({ exerciseFinished: true, webSocket: null });
+          console.log("🟢 **Frontend Received Final Data:**", data);
+          set({ resultData: data || {}, exerciseFinished: true });
 
-          if (onComplete) {
-            onComplete(data || {}); // ✅ Ensure `onComplete` always gets an object
-          }
+          if (onComplete) onComplete(data || {});
         }
       );
-
-      if (!ws) {
-        throw new Error("WebSocket connection failed.");
-      }
 
       set({ webSocket: ws });
 
       ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
-        set({ exerciseFinished: true, webSocket: null });
+        console.error("❌ WebSocket error:", error);
+        get().cleanupWebSocket();
+        if (onComplete) onComplete({});
+      };
 
-        if (onComplete) {
-          onComplete({}); // ✅ Ensure callback always receives an object
-        }
+      ws.onclose = () => {
+        console.log("🔴 WebSocket closed.");
+        get().cleanupWebSocket();
       };
     } catch (error) {
-      console.error("Error starting WebSocket exercise:", error);
-      set({ exerciseFinished: true });
-
-      if (onComplete) {
-        onComplete({}); // ✅ Ensure callback always receives an object
-      }
+      console.error("❌ Error starting WebSocket exercise:", error);
+      get().cleanupWebSocket();
+      if (onComplete) onComplete({});
     }
   },
 
-  stopWebSocketExercise: () => {
-    set((state) => {
-      if (state.webSocket && state.webSocket.readyState === WebSocket.OPEN) {
-        state.webSocket.close();
-      }
-      return { webSocket: null, exerciseFinished: true };
-    });
-  },
+  resetWebSocketState: () => set({ image: null, counter: 0, calories: null, exerciseFinished: false }),
 
-  setResultData: (data) => set({ resultData: data }),
+  cleanupWebSocket: () => {
+    const { webSocket } = get();
+    if (webSocket) {
+      webSocket.close();
+      set({ webSocket: null });
+    }
+    set({ exerciseFinished: true });
+  },
 }));
 
 export default useWebsocketStore;
