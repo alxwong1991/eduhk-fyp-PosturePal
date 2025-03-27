@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import useAuthStore from "../stores/authStore";
 import useExerciseLogStore from "../stores/exerciseLogStore";
 import {
@@ -14,6 +14,7 @@ import {
   Pagination,
   PageButton,
 } from "../styles/components/ShowExerciseLogStyles";
+
 
 export default function ShowExerciseLog() {
   const { user } = useAuthStore();

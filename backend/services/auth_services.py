@@ -57,10 +57,7 @@ async def login_user_service(login_data, session: AsyncSession):
     access_token = create_access_token({"user_id": user.id, "email": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
-async def get_current_user_service(
-    token: str = Depends(oauth2_scheme), 
-    session: AsyncSession = Depends(get_session)
-) -> User:
+async def get_current_user_service(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)) -> User:
     """Get the current logged-in user from JWT token."""
     try:
         payload = verify_access_token(token)

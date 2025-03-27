@@ -10,6 +10,8 @@ export default function ShowGoalTracker() {
 
   if (!user) return null; // Ensure user is loaded
 
+  console.log("daily calorie burned: " + user.daily_calories_burned);
+
   // ✅ Set daily calorie goal based on gender
   const getDailyCalorieGoal = () => {
     return user.gender === "Male" ? 2500 : user.gender === "Female" ? 2000 : 2200;

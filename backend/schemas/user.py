@@ -27,6 +27,7 @@ class UserProfileResponse(BaseModel):
     dob: date
     height_cm: float
     weight_kg: float
+    daily_calories_burned: float
 
     @classmethod
     def from_user(cls, user):
@@ -42,4 +43,5 @@ class UserProfileResponse(BaseModel):
             dob=user.dob,
             height_cm=user.height_cm,
             weight_kg=user.weight_kg,
+            daily_calories_burned=user.daily_calories_burned
         )
