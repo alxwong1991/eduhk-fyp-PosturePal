@@ -11,6 +11,10 @@ load_dotenv()
 # ✅ Get DATABASE_URL from .env
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# ✅ Convert asyncpg to psycopg2 (Alembic requires a sync driver)
+if DATABASE_URL.startswith("postgresql+asyncpg"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
+
 # ✅ Check if DATABASE_URL is set
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in the environment variables!")
@@ -18,7 +22,7 @@ if not DATABASE_URL:
 # ✅ Alembic Config object
 config = context.config
 
-# ✅ Set the database URL in Alembic config (AFTER validation)
+# ✅ Set the database URL in Alembic config (AFTER replacing asyncpg)
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # ✅ Setup logging

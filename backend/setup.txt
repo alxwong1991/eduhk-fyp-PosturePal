@@ -1,1 +1,0 @@
-pip install websockets python-dotenv mediapipe opencv-python uvicorn fastapi

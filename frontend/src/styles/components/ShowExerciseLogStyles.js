@@ -64,6 +64,18 @@ export const Value = styled.span`
   color: #f0f0f0;
 `;
 
+export const NoLogsMessage = styled.p`
+  color: #ff4d4d; /* Red text */
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border: 2px solid #ff4d4d;
+  border-radius: 8px;
+  max-width: 400px;
+`;
+
 export const DeleteButton = styled.button`
   background: transparent;
   color: white;

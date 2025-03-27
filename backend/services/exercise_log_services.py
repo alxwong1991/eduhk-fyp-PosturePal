@@ -48,14 +48,16 @@ async def get_user_exercises_service(user_id: int, session: AsyncSession):
     return exercises
 
 async def delete_exercise_log_service(log_id: int, session: AsyncSession, user: User):
-    """Delete an exercise log if it belongs to the user."""
-    result = await session.execute(select(ExerciseLog).where(ExerciseLog.id == log_id, ExerciseLog.user_id == user.id))
-    log = result.scalars().first()
+    """✅ Delete an exercise log if it belongs to the user."""
+    log = await session.get(ExerciseLog, log_id) 
 
     if not log:
-        raise HTTPException(status_code=404, detail="Exercise log not found")
+        raise HTTPException(status_code=404, detail=f"Exercise log with ID {log_id} not found")
 
-    await session.delete(log)
+    if log.user_id != user.id:  # ✅ Ensure the log belongs to the current user
+        raise HTTPException(status_code=403, detail="You are not authorized to delete this log")
+
+    await session.delete(log)  # ✅ Delete correctly
     await session.commit()
 
-    return {"message": "Exercise log deleted successfully"}
+    return {"message": f"Exercise log with ID {log_id} deleted successfully"}

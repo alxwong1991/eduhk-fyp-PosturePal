@@ -26,7 +26,7 @@ export default function Dashboard() {
       icon: "🤸",
       title: "Jumping Jacks",
       path: "/jumping-jacks",
-      available: false,
+      available: true,
     },
     { icon: "👊", title: "Push-Ups", path: "/push-ups", available: false },
   ];

@@ -3,6 +3,7 @@ import {
   ExerciseLeftSide,
   ExerciseButton,
   ExerciseInput,
+  EmptyStateMessage,
   ExerciseTitle,
   ExerciseRightSide,
   WebcamFrame,
@@ -21,9 +22,7 @@ const WebcamFeed = ({ image, isActive }) => {
           style={{ width: "100%", height: "100%", borderRadius: "10px" }}
         />
       ) : (
-        <p style={{ color: "#ccc", textAlign: "center", padding: "20px" }}>
-          No Camera Feed Available
-        </p>
+        <EmptyStateMessage>No Camera Feed Available</EmptyStateMessage>
       )}
     </WebcamFrame>
   );

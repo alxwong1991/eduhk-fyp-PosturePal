@@ -4,6 +4,7 @@ import useAuthStore from "../stores/authStore";
 import useExerciseLogStore from "../stores/exerciseLogStore";
 import {
   Container,
+  NoLogsMessage,
   LogGrid,
   LogCard,
   LogHeader,
@@ -74,7 +75,7 @@ export default function ShowExerciseLog() {
   return (
     <Container>
       {exerciseLogs.length === 0 ? (
-        <p>No exercise logs available.</p>
+        <NoLogsMessage>No exercise logs available.</NoLogsMessage>
       ) : (
         <>
           <LogGrid>

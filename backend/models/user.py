@@ -1,8 +1,8 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 from pydantic import EmailStr
-import bcrypt
 from datetime import date, datetime
+from utils.security import verify_password  # ✅ Import from security.py
 
 class User(SQLModel, table=True):
     """✅ User model with relationship to ExerciseLog."""
@@ -26,10 +26,6 @@ class User(SQLModel, table=True):
         age = today.year - self.dob.year - ((today.month, today.day) < (self.dob.month, self.dob.day))
         return age
 
-    def verify_password(self, password: str) -> bool:
-        """✅ Verify hashed password."""
-        return bcrypt.checkpw(password.encode(), self.password_hash.encode())
-
-def hash_password(password: str) -> str:
-    """✅ Hash a password before storing it."""
-    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    def check_password(self, password: str) -> bool:
+        """✅ Verify hashed password (renamed to avoid confusion)."""
+        return verify_password(password, self.password_hash)

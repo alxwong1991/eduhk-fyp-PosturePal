@@ -1,5 +1,6 @@
 from exercises.bicep_curls import BicepCurls
 from exercises.squats import Squats
+from exercises.jumping_jacks import JumpingJacks
 
 class ExerciseHelper:
     def __init__(self):
@@ -15,6 +16,7 @@ class ExerciseHelper:
         exercise_classes = {
             "bicep_curls": BicepCurls,
             "squats": Squats,
+            "jumping_jacks":  JumpingJacks
         }
 
         if exercise_name not in exercise_classes:

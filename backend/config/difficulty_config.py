@@ -23,6 +23,11 @@ DIFFICULTY_LEVELS = {
         "easy": 25,  # ✅ ~8 reps per minute
         "medium": 40,  # ✅ ~12-15 reps per minute
         "hard": 55  # ✅ ~18-20 reps per minute
+    },
+    "jumping_jacks": {
+        "easy": 20,  # ✅ ~8 reps per minute
+        "medium": 35,  # ✅ ~12-15 reps per minute
+        "hard": 45  # ✅ ~18-20 reps per minute
     }
 }
 

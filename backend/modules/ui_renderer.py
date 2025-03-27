@@ -7,7 +7,7 @@ class UIRenderer:
 
     def render_status_box(self, frame, counter, stage, remaining_time):
         # Setup status box
-        cv2.rectangle(frame, (0, 0), (500, 80), (245, 117, 16), -1)
+        cv2.rectangle(frame, (0, 0), (430, 80), (245, 117, 16), -1)
 
         # Rep data
         cv2.putText(frame, "REPS", (15, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)

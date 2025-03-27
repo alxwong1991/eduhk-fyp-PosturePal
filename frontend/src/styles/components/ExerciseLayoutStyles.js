@@ -61,6 +61,18 @@ export const WebcamFrame = styled.div`
   transition: border 0.3s ease-in-out;
 `;
 
+export const EmptyStateMessage = styled.p`
+  color: #ccc;
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 15px;
+  width: 100%;
+`;
+
 // Title styling
 export const ExerciseTitle = styled.h1`
   font-size: 32px;

@@ -17,7 +17,7 @@ class Squats:
         self.max_reps = DIFFICULTY_LEVELS.get("squats", {}).get(DEFAULT_DIFFICULTY, 10)
 
         # Countdown timer
-        self.timer = 20
+        self.timer = 40
         self.timer_instance = CountdownTimer(self.timer)
         self.timer_started = False
 

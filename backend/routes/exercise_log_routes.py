@@ -22,7 +22,7 @@ async def get_user_exercises(user_id: int, session: AsyncSession = Depends(get_s
     """Fetch all exercise logs for a user."""
     return await get_user_exercises_service(user_id, session)
 
-@exercise_log_router.delete("/exercise/log/{log_id}")
+@exercise_log_router.delete("/log/{log_id}")
 async def delete_exercise_log(
     log_id: int, 
     session: AsyncSession = Depends(get_session), 
