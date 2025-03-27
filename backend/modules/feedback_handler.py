@@ -1,17 +1,11 @@
 import cv2
 from mediapipe.python.solutions import pose as mp_pose
+from modules.pose_math import calculate_angle
 import numpy as np
 
 class FeedbackHandler:
     def __init__(self):
         pass
-
-    def calculate_angle(self, a, b, c):
-        """Calculate the angle between three points."""
-        a, b, c = np.array(a), np.array(b), np.array(c)
-        radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
-        angle = np.abs(radians * 180.0 / np.pi)
-        return angle if angle <= 180.0 else 360 - angle
 
     # def check_back_straight(self, landmarks):
     #     """✅ Check if the user's back is straight for bicep curls."""
@@ -46,7 +40,7 @@ class FeedbackHandler:
         left_wrist = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x,
                       landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y]
 
-        arm_angle = self.calculate_angle(left_shoulder, left_elbow, left_wrist)
+        arm_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
         
         if arm_angle > 160:
             print("yes")
@@ -72,7 +66,7 @@ class FeedbackHandler:
         left_wrist = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x,
                       landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y]
 
-        arm_forward_angle = self.calculate_angle(left_shoulder, left_elbow, left_wrist)
+        arm_forward_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
         print(f"[INFO] Arm Straight Angle Detected: {arm_forward_angle:.2f}°", end=" - ")
 
         # ✅ Calculate elbow coordinates for visualization

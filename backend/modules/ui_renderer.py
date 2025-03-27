@@ -5,7 +5,7 @@ class UIRenderer:
     def __init__(self):
         self.feedback_handler = FeedbackHandler()
 
-    def render_status_box(self, frame, counter, stage, remaining_time, calories_burned):
+    def render_status_box(self, frame, counter, stage, remaining_time):
         # Setup status box
         cv2.rectangle(frame, (0, 0), (500, 80), (245, 117, 16), -1)
 
@@ -24,10 +24,6 @@ class UIRenderer:
 
         cv2.putText(frame, "TIME", (295, 12), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
         cv2.putText(frame, f"{remaining_time}s", (310, 60), cv2.FONT_HERSHEY_SIMPLEX, 2, timer_color, 2, cv2.LINE_AA)
-
-        # ✅ Calories burned
-        cv2.putText(frame, "CALORIES", (375, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, cv2.LINE_AA)
-        cv2.putText(frame, f"{calories_burned:.2f} kcal", (380, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
 
         return frame
         

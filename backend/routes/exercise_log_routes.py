@@ -3,7 +3,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from models.user import User
 from database import get_session
 from schemas.exercise_log import ExerciseCreate, ExerciseResponse
-from services.exercise_log_services import log_exercise_service, get_user_exercises_service
+from services.exercise_log_services import log_exercise_service, get_user_exercises_service, delete_exercise_log_service
 from services.auth_services import get_current_user_service
 
 exercise_log_router = APIRouter()
@@ -21,3 +21,12 @@ async def log_exercise(
 async def get_user_exercises(user_id: int, session: AsyncSession = Depends(get_session)):
     """Fetch all exercise logs for a user."""
     return await get_user_exercises_service(user_id, session)
+
+@exercise_log_router.delete("/exercise/log/{log_id}")
+async def delete_exercise_log(
+    log_id: int, 
+    session: AsyncSession = Depends(get_session), 
+    user = Depends(get_current_user_service)
+    ):
+    """Delete an exercise log if it belongs to the user."""
+    return await delete_exercise_log_service(log_id, session, user)

@@ -46,3 +46,16 @@ async def get_user_exercises_service(user_id: int, session: AsyncSession):
         raise HTTPException(status_code=404, detail="No exercises found")
 
     return exercises
+
+async def delete_exercise_log_service(log_id: int, session: AsyncSession, user: User):
+    """Delete an exercise log if it belongs to the user."""
+    result = await session.execute(select(ExerciseLog).where(ExerciseLog.id == log_id, ExerciseLog.user_id == user.id))
+    log = result.scalars().first()
+
+    if not log:
+        raise HTTPException(status_code=404, detail="Exercise log not found")
+
+    await session.delete(log)
+    await session.commit()
+
+    return {"message": "Exercise log deleted successfully"}

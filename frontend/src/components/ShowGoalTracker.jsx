@@ -19,11 +19,11 @@ export default function ShowGoalTracker() {
 
   const dailyGoal = getDailyCalorieGoal();
   const progress = Math.min((user.daily_calories_burned / dailyGoal) * 100, 100);
-  const progressColor = progress < 30 ? "red" : progress < 80 ? "yellow" : "green"; // ✅ Color-coded progress
+  const progressColor = progress < 30 ? "red" : progress < 80 ? "orange" : "green"; // ✅ Color-coded progress
 
   return (
     <ProgressContainer>
-      <Label>🔥 Daily Calorie Goal ({dailyGoal} kcal)</Label>
+      <Label>🔥 Daily Calorie Goal ({dailyGoal} kcal) 🔥</Label>
       <ProgressBar style={{ width: `${progress}%`, backgroundColor: progressColor }}>
         {Math.round(progress)}%
       </ProgressBar>

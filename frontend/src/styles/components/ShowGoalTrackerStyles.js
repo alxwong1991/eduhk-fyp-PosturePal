@@ -19,10 +19,11 @@ export const ProgressBar = styled.div`
   text-align: center;
   line-height: 20px;
   transition: width 0.5s ease-in-out;
+  margin-top: 1rem;
 `;
 
 export const Label = styled.span`
   color: white;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.6rem;
 `;

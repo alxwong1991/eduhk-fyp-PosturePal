@@ -66,14 +66,22 @@ export const Value = styled.span`
 
 export const DeleteButton = styled.button`
   background: transparent;
-  border: none;
-  color: red;
+  color: white;
+  border: 2px solid #fff;
   font-size: 1.2rem;
+  padding: 5px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    color: darkred;
+    background: red;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 

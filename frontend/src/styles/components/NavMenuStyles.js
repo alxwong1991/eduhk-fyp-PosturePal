@@ -33,7 +33,7 @@ export const NavButton = styled.button`
   border-radius: 8px;
   background: transparent;
   color: white;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -52,7 +52,7 @@ export const UserInfo = styled.div`
   align-items: center;
   gap: 10px;
   color: white;
-  font-size: 1rem;
+  font-size: 1.2rem;
 `;
 
 export const UserName = styled.span`

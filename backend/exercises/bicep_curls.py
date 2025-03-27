@@ -6,6 +6,7 @@ from modules.countdown_timer import CountdownTimer
 from modules.ui_renderer import UIRenderer
 from modules.feedback_handler import FeedbackHandler
 from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
+from modules.pose_math import calculate_angle
 
 class BicepCurls:
     def __init__(self):
@@ -33,15 +34,6 @@ class BicepCurls:
         self.counter = 0
         self.stage = None
         self.timer_started = False  # ✅ Reset timer flag
-
-    def calculate_angle(self, a, b, c):
-        """Calculate the angle between three points."""
-        a, b, c = np.array(a), np.array(b), np.array(c)
-
-        radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
-        angle = np.abs(radians * 180.0 / np.pi)
-
-        return angle if angle <= 180.0 else 360 - angle
 
     def detect(self, frame):
         """Detects pose landmarks from an image frame."""
@@ -108,7 +100,7 @@ class BicepCurls:
 
         return self.counter, arm_color
 
-    def perform_exercise(self, frame, max_reps, calories_burned=0):
+    def perform_exercise(self, frame, max_reps):
         """✅ Process frame and track bicep curls exercise with correct posture check."""
         if not self.timer_started:
             self.timer_instance = CountdownTimer(self.timer)
@@ -133,7 +125,7 @@ class BicepCurls:
             wrist = [landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].x, 
                     landmarks.landmark[mp_pose.PoseLandmark.LEFT_WRIST].y]
 
-            angle = self.calculate_angle(shoulder, elbow, wrist)
+            angle = calculate_angle(shoulder, elbow, wrist)
 
             update_result = self.update(angle, landmarks)
             if isinstance(update_result, tuple) and len(update_result) == 2:
@@ -152,7 +144,7 @@ class BicepCurls:
             # ✅ Ensure feedback message is displayed **AFTER** all drawings
             self.ui_renderer.display_feedback_message(image, self.feedback_message, arm_color)
 
-            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time, calories_burned)
+            image = self.ui_renderer.render_status_box(image, self.counter, self.stage, remaining_time)
 
             # ✅ Draw pose landmarks
             mp_drawing.draw_landmarks(

@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 class ExerciseLog(SQLModel, table=True):
@@ -11,7 +11,7 @@ class ExerciseLog(SQLModel, table=True):
     total_reps: int
     calories_burned: float
     duration_minutes: float
-    exercise_date: datetime = Field(default_factory=datetime.utcnow)
+    exercise_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # ✅ Use forward reference "User" (string) to prevent circular import
     user: Optional["User"] = Relationship(back_populates="exercise_logs")  # ✅ Fixed relationship name
