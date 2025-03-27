@@ -28,8 +28,9 @@ export default function Profile() {
     <Container>
       <NavMenu />
       <ShowGoalTracker />
+
+      {/* ✅ Profile Information Section */}
       <Section>
-        {/* ✅ Profile Section */}
         <SectionHeader>Profile Information</SectionHeader>
         <ProfileCard>
           <ProfileImage>
@@ -57,8 +58,10 @@ export default function Profile() {
             <Label>Weight:</Label> <Value>{user.weight_kg} kg</Value>
           </Info>
         </ProfileCard>
+      </Section>
 
-        {/* ✅ Exercise Log Section */}
+      {/* ✅ Exercise Log History Section */}
+      <Section>
         <SectionHeader>Exercise Log History</SectionHeader>
         <ShowExerciseLog />
       </Section>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import useAuthStore from "../stores/authStore";
 import useExerciseLogStore from "../stores/exerciseLogStore";
 import {
@@ -20,17 +21,28 @@ export default function ShowExerciseLog() {
   const { user } = useAuthStore();
   const { exerciseLogs, loadLogs, deleteLog } = useExerciseLogStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 3; // ✅ Show 3 logs per page
+  const logsPerPage = 2; // ✅ Show 2 logs per page
 
   useEffect(() => {
     if (user) {
       loadLogs(user.id);
     }
-  }, [user]);
+  }, [user, loadLogs]); // ✅ Fix: Added `loadLogs` to dependencies
 
   const handleDelete = async (logId) => {
-    if (window.confirm("Are you sure you want to delete this log?")) {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "This action will permanently delete the log.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
       await deleteLog(logId);
+      Swal.fire("Deleted!", "The exercise log has been removed.", "success");
     }
   };
 

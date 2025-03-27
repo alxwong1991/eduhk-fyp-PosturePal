@@ -2,25 +2,27 @@ import { create } from "zustand";
 import { loginUser, registerUser, getUserProfile, logoutUser } from "../api/auth";
 import { jwtDecode } from "jwt-decode";
 
-// ✅ Safely parse JSON from localStorage
+// ✅ Helper function to safely parse JSON
 const getStoredUser = () => {
   try {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("user"); // ⬅️ Use localStorage
     return storedUser ? JSON.parse(storedUser) : null;
   } catch {
     return null;
   }
 };
 
+const getStoredToken = () => localStorage.getItem("access_token") || null;
+
 const useAuthStore = create((set, get) => ({
   user: getStoredUser(),
-  token: localStorage.getItem("access_token") || null,
+  token: getStoredToken(),
   loading: true,
   sessionExpired: false,
 
   // ✅ Check if token is expired
   isTokenExpired: () => {
-    const token = localStorage.getItem("access_token");
+    const token = get().token;
     if (!token) return true;
 
     try {
@@ -40,9 +42,10 @@ const useAuthStore = create((set, get) => ({
 
     try {
       const userData = await getUserProfile();
-      localStorage.setItem("user", JSON.stringify(userData));
+      sessionStorage.setItem("user", JSON.stringify(userData));
       set({ user: userData, sessionExpired: false });
     } catch (error) {
+      console.error("Failed to fetch user:", error);
       if (error.message === "Session expired") {
         get().handleSessionExpiration();
       }
@@ -53,31 +56,43 @@ const useAuthStore = create((set, get) => ({
 
   // ✅ Handle login & persist token
   login: async (credentials) => {
-    const data = await loginUser(credentials);
-    localStorage.setItem("access_token", data.access_token);
-    await get().fetchUser();
-    set({ token: data.access_token, sessionExpired: false });
+    try {
+      const data = await loginUser(credentials);
+      sessionStorage.setItem("access_token", data.access_token);
+      set({ token: data.access_token, sessionExpired: false });
+
+      await get().fetchUser(); // ✅ Auto-fetch user after login
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw error;
+    }
   },
 
   // ✅ Handle user registration
   register: async (userData) => {
-    await registerUser(userData);
+    try {
+      await registerUser(userData);
+    } catch (error) {
+      console.error("Registration failed:", error);
+      throw error;
+    }
   },
 
   // ✅ Handle logout & clear storage
   logout: () => {
     logoutUser();
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
+    sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("user");
     set({ user: null, token: null, sessionExpired: false });
   },
 
-  // ✅ Prevent session expiration from looping
+  // ✅ Handle session expiration gracefully
   handleSessionExpiration: () => {
-    if (get().sessionExpired) return;
+    if (get().sessionExpired) return; // Prevents repeated logouts
 
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user");
+    console.warn("Session expired. Logging out...");
+    sessionStorage.removeItem("access_token");
+    sessionStorage.removeItem("user");
     set({ user: null, token: null, sessionExpired: true });
   },
 }));

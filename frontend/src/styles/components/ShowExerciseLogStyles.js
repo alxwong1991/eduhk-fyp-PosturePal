@@ -9,6 +9,18 @@ export const Container = styled.div`
   margin-top: 20px;
 `;
 
+export const LogGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* ✅ Always 2 cards per row */
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: repeat(1, 1fr); /* ✅ Switch to 1 column on small screens */
+  }
+`;
+
 export const LogCard = styled.div`
   background: rgba(255, 255, 255, 0.15); /* ✅ Glassmorphism effect */
   backdrop-filter: blur(10px);
@@ -18,14 +30,6 @@ export const LogCard = styled.div`
   box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.2);
   color: white;
   margin-bottom: 15px;
-`;
-
-export const LogGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 15px;
-  width: 100%;
-  margin-top: 20px;
 `;
 
 export const LogHeader = styled.div`
