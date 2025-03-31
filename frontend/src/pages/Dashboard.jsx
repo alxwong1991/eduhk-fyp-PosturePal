@@ -22,13 +22,13 @@ export default function Dashboard() {
   const exercises = [
     { icon: "💪", title: "Bicep Curls", path: "/bicep-curls", available: true },
     { icon: "🏃", title: "Squats", path: "/squats", available: true },
-    {
-      icon: "🤸",
-      title: "Jumping Jacks",
-      path: "/jumping-jacks",
-      available: true,
-    },
-    { icon: "👊", title: "Push-Ups", path: "/push-ups", available: false },
+    // {
+    //   icon: "🤸",
+    //   title: "Jumping Jacks",
+    //   path: "/jumping-jacks",
+    //   available: true,
+    // },
+    // { icon: "👊", title: "Push-Ups", path: "/push-ups", available: false },
   ];
 
   const handleStartExercise = (exercisePath, available) => {
@@ -43,7 +43,7 @@ export default function Dashboard() {
     }
 
     if (available) {
-      navigate(exercisePath); // ✅ Navigate first to the correct exercise page
+      navigate(exercisePath);
     }
   };
 

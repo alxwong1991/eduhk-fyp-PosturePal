@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 // ✅ Helper function to safely parse JSON
 const getStoredUser = () => {
   try {
-    const storedUser = localStorage.getItem("user"); // ⬅️ Use localStorage
+    const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   } catch {
     return null;

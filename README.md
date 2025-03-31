@@ -16,42 +16,42 @@
 ## 🛠 Tech Stack for PosturePal
 
 ### 🔹 Frontend (User Interface)
-*React.js* – Modern JavaScript frontend library for building UI
-*Vite* – Fast build tool for React apps
-*Styled Components* – CSS-in-JS library for styling
-*Axios* – API client for handling HTTP requests
-*Zustand* – Lightweight state management for React
-*WebSockets* – Real-time communication for live exercise tracking
+- *React.js* – Modern JavaScript frontend library for building UI
+- *Vite* – Fast build tool for React apps
+- *Styled Components* – CSS-in-JS library for styling
+- *Axios* – API client for handling HTTP requests
+- *Zustand* – Lightweight state management for React
+- *WebSockets* – Real-time communication for live exercise tracking
 
 ### 🔹 Backend (API & Business Logic)
-*FastAPI* – High-performance Python web framework
-*SQLModel* – ORM for interacting with the database
-*Pydantic* – Data validation and serialization
-*Uvicorn* – ASGI server for running FastAPI
+- *FastAPI* – High-performance Python web framework
+- *SQLModel* – ORM for interacting with the database
+- *Pydantic* – Data validation and serialization
+- *Uvicorn* – ASGI server for running FastAPI
 
 ### 🔹 Database & Storage
-*PostgreSQL* – Relational database for storing exercise logs, users, and calorie data
-*SQLAlchemy (via SQLModel)* – ORM for database interactions
-*Alembic* – Database migration tool
+- *PostgreSQL* – Relational database for storing exercise logs, users, and calorie data
+- *SQLAlchemy (via SQLModel)* – ORM for database interactions
+- *Alembic* – Database migration tool
 
 ### 🔹 Authentication & Security
-*OAuth2 & JWT (JSON Web Tokens)* – Secure user authentication
-*bcrypt* – Password hashing for user accounts
-*OAuth2PasswordBearer* – Token-based authentication
+- *OAuth2 & JWT (JSON Web Tokens)* – Secure user authentication
+- *bcrypt* – Password hashing for user accounts
+- *OAuth2PasswordBearer* – Token-based authentication
 
 ### 🔹 AI & Computer Vision
-*MediaPipe* – Pose detection for exercise tracking
-*OpenCV* – Image processing library for webcam integration
-*NumPy* – Efficient numerical calculations for AI models
+- *MediaPipe* – Pose detection for exercise tracking
+- *OpenCV* – Image processing library for webcam integration
+- *NumPy* – Efficient numerical calculations for AI models
 
 ### 🔹 Development & Deployment
-*Docker* – Containerization for PostgreSQL database
-*Docker Compose* – Managing multi-container environments
-*Git & GitHub* – Version control and collaboration
-*Postman* – API testing and debugging
+- *Docker* – Containerization for PostgreSQL database
+- *Docker Compose* – Managing multi-container environments
+- *Git & GitHub* – Version control and collaboration
+- *Postman* – API testing and debugging
 
 ### 🔹 Additional Tools
-*dotenv* – Environment variable management
+- *dotenv* – Environment variable management
 
 ## 📋 Prerequisites
 Before getting started, ensure you have the following installed:
