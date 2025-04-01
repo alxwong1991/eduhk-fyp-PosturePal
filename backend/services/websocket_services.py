@@ -6,7 +6,7 @@ from sqlmodel import Session
 from modules.camera import Camera
 from modules.exercise_helper import ExerciseHelper
 from config.difficulty_config import DIFFICULTY_LEVELS, DEFAULT_DIFFICULTY
-from modules.calorie_tracker import calculate_calories_burned
+from modules.calorie_tracker import estimate_calories_burned
 from services.auth_services import get_user
 
 async def check_camera_service():
@@ -45,25 +45,43 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
     duration_seconds = round(elapsed_time, 2)
     duration_minutes = round(duration_seconds / 60, 2)
 
-    print(f"⏳ Elapsed Time: {duration_seconds} sec ({duration_minutes} min)")
+    # ✅ Validate user profile data
+    if not user:
+        await websocket.send_json({"error": "User not found."})
+        print("❌ ERROR: User not found.")
+        return None, None, None, True
 
-    # ✅ Set default weight if user is not logged in
-    weight_kg = 80 if user is None else user.weight_kg
+    required_fields = ["weight_kg", "height_cm", "gender", "dob"]
+    missing_fields = [field for field in required_fields if not getattr(user, field, None)]
 
-    if weight_kg is None:
-        print("❌ ERROR: User weight is missing! Using default 80kg.")
-        weight_kg = 80
+    if missing_fields:
+        await websocket.send_json({
+            "error": f"User profile incomplete. Missing: {', '.join(missing_fields)}."
+        })
+        print(f"❌ ERROR: Missing user profile data: {missing_fields}")
+        return None, None, None, True
 
-    print(f"🔍 Using Weight: {weight_kg} kg for calorie calculation")
+    print(f"🔍 Using Weight: {user.weight_kg} kg for calorie calculation")
 
-    # ✅ Track calories ONLY when a rep is completed
-    calories_per_rep = calculate_calories_burned(weight_kg, exercise, 3)  # Assume each rep takes ~3s
-    if new_counter > exercise_helper.previous_counter:  # ✅ Check if a new rep is completed
+    age = user.calculate_age()
+    print(f"🔍 Using Weight: {user.weight_kg} kg and Age: {age} years")
+
+    # ✅ Estimate calories for a single rep (~3 seconds)
+    calories_per_rep = estimate_calories_burned(
+        weight_kg=user.weight_kg,
+        height_cm=user.height_cm,
+        age = age,
+        gender=user.gender,
+        exercise_name=exercise,
+        duration_seconds=3  # Estimated duration per rep
+    )
+
+    if new_counter > exercise_helper.previous_counter:
         total_calories_burned += calories_per_rep
 
-    # ✅ Update the counter (store last rep count to detect new reps)
-    exercise_helper.previous_counter = new_counter  
+    exercise_helper.previous_counter = new_counter
 
+    # 📸 Encode frame for transmission
     _, buffer = cv2.imencode(".jpg", frame)
     base64_frame = base64.b64encode(buffer).decode("utf-8")
 
@@ -75,13 +93,11 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
         "totalCaloriesBurned": round(total_calories_burned, 2)
     }
 
-    # ✅ Create a copy without the "image" key for debugging
+    # 🧾 Log data without image
     response_data_debug = response_data.copy()
-    response_data_debug.pop("image", None)  # ✅ Remove "image" for logging
-
-    # ✅ Pretty print response (without image)
+    response_data_debug.pop("image", None)
     print("📊 **Formatted Response Data (Without Image):**")
-    print(json.dumps(response_data_debug, indent=4))  # ✅ Clean output
+    print(json.dumps(response_data_debug, indent=4))
 
     await websocket.send_json(response_data)
 

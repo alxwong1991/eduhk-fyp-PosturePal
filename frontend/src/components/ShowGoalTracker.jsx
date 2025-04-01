@@ -8,18 +8,18 @@ import {
 export default function ShowGoalTracker() {
   const { user } = useAuthStore();
 
-  if (!user) return null; // Ensure user is loaded
+  if (!user) return null;
 
-  console.log("daily calorie burned: " + user.daily_calories_burned);
-
-  // ✅ Set daily calorie goal based on gender
   const getDailyCalorieGoal = () => {
-    return user.gender === "Male" ? 2500 : user.gender === "Female" ? 2000 : 2200;
+    if (user.gender === "Male") return 300;
+    if (user.gender === "Female") return 200;
+    return 250; // Neutral for other/undefined genders
   };
 
   const dailyGoal = getDailyCalorieGoal();
-  const progress = Math.min((user.daily_calories_burned / dailyGoal) * 100, 100);
-  const progressColor = progress < 30 ? "red" : progress < 80 ? "orange" : "green"; // ✅ Color-coded progress
+  const burned = user.daily_calories_burned || 0;
+  const progress = Math.min((burned / dailyGoal) * 100, 100);
+  const progressColor = progress < 30 ? "red" : progress < 80 ? "orange" : "green";
 
   return (
     <ProgressContainer>
