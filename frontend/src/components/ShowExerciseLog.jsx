@@ -22,13 +22,13 @@ export default function ShowExerciseLog() {
   const { user } = useAuthStore();
   const { exerciseLogs, loadLogs, deleteLog } = useExerciseLogStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const logsPerPage = 2; // ✅ Show 2 logs per page
+  const logsPerPage = 2; // Show 2 logs per page
 
   useEffect(() => {
     if (user) {
       loadLogs(user.id);
     }
-  }, [user, loadLogs]); // ✅ Fix: Added `loadLogs` to dependencies
+  }, [user, loadLogs]); // Fix: Added `loadLogs` to dependencies
 
   const handleDelete = async (logId) => {
     const result = await Swal.fire({

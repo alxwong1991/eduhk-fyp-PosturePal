@@ -29,17 +29,17 @@ def estimate_calories_burned(
     Returns:
         float: Estimated calories burned
     """
-    # ✅ Normalize inputs
+    # Normalize inputs
     gender = gender.lower().strip()
     exercise_name = exercise_name.lower().strip()
 
-    # ✅ Fallback MET value if not found
+    # Fallback MET value if not found
     met = MET_VALUES.get(exercise_name, 3.5)
     
-    # ✅ Convert duration to hours
+    # Convert duration to hours
     duration_hours = duration_seconds / 3600
 
-    # ✅ Calculate calories burned
+    # Calculate calories burned
     calories = met * weight_kg * duration_hours
 
     return round(calories, 4)

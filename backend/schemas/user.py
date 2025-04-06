@@ -18,11 +18,11 @@ class LoginRequest(BaseModel):
     password: str
 
 class UserProfileResponse(BaseModel):
-    """✅ Schema for returning user profile info."""
+    """Schema for returning user profile info."""
     id: int
     name: str
     email: EmailStr
-    age: int  # ✅ Ensure age is included in the response
+    age: int
     gender: str
     dob: date
     height_cm: float
@@ -31,14 +31,14 @@ class UserProfileResponse(BaseModel):
 
     @classmethod
     def from_user(cls, user):
-        """✅ Compute age dynamically before returning the response."""
+        """Compute age dynamically before returning the response."""
         today = datetime.today().date()
         age = today.year - user.dob.year - ((today.month, today.day) < (user.dob.month, user.dob.day))
         return cls(
             id=user.id,
             name=user.name,
             email=user.email,
-            age=age,  # ✅ Age is now calculated dynamically
+            age=age,
             gender=user.gender,
             dob=user.dob,
             height_cm=user.height_cm,

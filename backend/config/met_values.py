@@ -1,4 +1,4 @@
-# ✅ MET values for supported exercises
+# MET values for supported exercises
 MET_VALUES = {
     "bicep curls": 3.5,
     "squats": 5.0,

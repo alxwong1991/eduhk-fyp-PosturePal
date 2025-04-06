@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { loginUser, registerUser, getUserProfile, logoutUser } from "../api/auth";
 import { jwtDecode } from "jwt-decode";
 
-// ✅ Helper function to safely parse JSON
+// Helper function to safely parse JSON
 const getStoredUser = () => {
   try {
     const storedUser = sessionStorage.getItem("user")
@@ -20,7 +20,7 @@ const useAuthStore = create((set, get) => ({
   loading: true,
   sessionExpired: false,
 
-  // ✅ Check if token is expired
+  // Check if token is expired
   isTokenExpired: () => {
     const token = get().token;
     if (!token) return true;
@@ -33,7 +33,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ✅ Fetch user profile & handle expired token
+  // Fetch user profile & handle expired token
   fetchUser: async () => {
     if (get().isTokenExpired()) {
       get().handleSessionExpiration();
@@ -54,21 +54,21 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ✅ Handle login & persist token
+  // Handle login & persist token
   login: async (credentials) => {
     try {
       const data = await loginUser(credentials);
       sessionStorage.setItem("access_token", data.access_token);
       set({ token: data.access_token, sessionExpired: false });
 
-      await get().fetchUser(); // ✅ Auto-fetch user after login
+      await get().fetchUser(); // Auto-fetch user after login
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
     }
   },
 
-  // ✅ Handle user registration
+  // Handle user registration
   register: async (userData) => {
     try {
       await registerUser(userData);
@@ -78,7 +78,7 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
-  // ✅ Handle logout & clear storage
+  // Handle logout & clear storage
   logout: () => {
     logoutUser();
     sessionStorage.removeItem("access_token");
@@ -86,7 +86,7 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, token: null, sessionExpired: false });
   },
 
-  // ✅ Handle session expiration gracefully
+  // Handle session expiration gracefully
   handleSessionExpiration: () => {
     if (get().sessionExpired) return; // Prevents repeated logouts
 

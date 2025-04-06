@@ -18,7 +18,7 @@ async def login_user(login_data: LoginRequest, session: AsyncSession = Depends(g
 @auth_router.get("/profile", response_model=UserProfileResponse)
 async def get_profile(user: User = Depends(get_current_user_service)):
     """Retrieve the profile of the logged-in user."""
-    return UserProfileResponse.from_user(user)  # ✅ Directly use `user`
+    return UserProfileResponse.from_user(user)  # Directly use `user`
 
 @auth_router.post("/logout")
 async def logout_user(user: User = Depends(get_current_user_service)):

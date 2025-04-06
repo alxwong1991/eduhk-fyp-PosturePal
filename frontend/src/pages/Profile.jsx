@@ -29,7 +29,7 @@ export default function Profile() {
       <NavMenu />
       <ShowGoalTracker />
 
-      {/* ✅ Profile Information Section */}
+      {/* Profile Information Section */}
       <Section>
         <SectionHeader>Profile Information</SectionHeader>
         <ProfileCard>
@@ -60,7 +60,7 @@ export default function Profile() {
         </ProfileCard>
       </Section>
 
-      {/* ✅ Exercise Log History Section */}
+      {/* Exercise Log History Section */}
       <Section>
         <SectionHeader>Exercise Log History</SectionHeader>
         <ShowExerciseLog />

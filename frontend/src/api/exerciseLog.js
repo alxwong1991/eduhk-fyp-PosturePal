@@ -2,12 +2,12 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ✅ Helper function to get the auth token
+// Helper function to get the auth token
 function getAuthToken() {
   return localStorage.getItem("access_token");
 }
 
-// ✅ Save exercise log to backend
+// Save exercise log to backend
 export async function saveExerciseLog(userId, exerciseName, totalReps, totalCalories, durationMinutes) {
   try {
     const token = getAuthToken();
@@ -31,12 +31,12 @@ export async function saveExerciseLog(userId, exerciseName, totalReps, totalCalo
 
     return response.data;
   } catch (error) {
-    console.error("❌ Failed to save exercise log:", error.response?.data?.detail || error.message);
+    console.error("Failed to save exercise log:", error.response?.data?.detail || error.message);
     throw new Error(error.response?.data?.detail || "Failed to save exercise log");
   }
 }
 
-// ✅ Fetch exercise logs from backend
+// Fetch exercise logs from backend
 export async function fetchExerciseLogs(userId) {
   try {
     const token = getAuthToken();
@@ -50,14 +50,14 @@ export async function fetchExerciseLogs(userId) {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    return response.data.reverse(); // ✅ Show most recent logs first
+    return response.data.reverse(); // Show most recent logs first
   } catch (error) {
-    console.error("❌ Failed to fetch exercise logs:", error.response?.data?.detail || error.message);
+    console.error("Failed to fetch exercise logs:", error.response?.data?.detail || error.message);
     throw new Error(error.response?.data?.detail || "Failed to fetch exercise logs");
   }
 }
 
-// ✅ Delete an exercise log from backend
+// Delete an exercise log from backend
 export async function deleteExerciseLog(logId) {
   try {
     const token = getAuthToken();
@@ -73,7 +73,7 @@ export async function deleteExerciseLog(logId) {
 
     return { success: true };
   } catch (error) {
-    console.error("❌ Failed to delete exercise log:", error.response?.data?.detail || error.message);
+    console.error("Failed to delete exercise log:", error.response?.data?.detail || error.message);
     throw new Error(error.response?.data?.detail || "Failed to delete exercise log");
   }
 }

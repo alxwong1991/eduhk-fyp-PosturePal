@@ -66,10 +66,10 @@ class JumpingJacks:
         right_shoulder = [landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].x,
                           landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER].y]
 
-        # ✅ Check if hands are raised above shoulders (Jumping Up)
+        # Check if hands are raised above shoulders (Jumping Up)
         hands_up = (left_wrist[1] < left_shoulder[1]) and (right_wrist[1] < right_shoulder[1])
 
-        # ✅ Check if legs are apart (Jumping Out)
+        # Check if legs are apart (Jumping Out)
         leg_distance = abs(left_ankle[0] - right_ankle[0])
         legs_apart = leg_distance > 0.2  # Adjust this threshold as needed
 
@@ -77,7 +77,7 @@ class JumpingJacks:
             self.stage = "open"
         elif self.stage == "open" and not hands_up and not legs_apart:
             self.stage = "closed"
-            self.counter += 1  # ✅ Count one Jumping Jack
+            self.counter += 1  # Count one Jumping Jack
 
         return self.counter
 

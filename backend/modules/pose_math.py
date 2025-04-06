@@ -1,7 +1,7 @@
 import numpy as np
 
 def calculate_angle(a, b, c):
-    """✅ Calculate the angle between three points.
+    """Calculate the angle between three points.
     
     Args:
         a (list or tuple): Coordinates of the first point (x, y).

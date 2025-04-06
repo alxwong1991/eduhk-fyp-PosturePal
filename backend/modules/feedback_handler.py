@@ -8,7 +8,7 @@ class FeedbackHandler:
         pass
 
     # def check_back_straight(self, landmarks):
-    #     """✅ Check if the user's back is straight for bicep curls."""
+    #     """Check if the user's back is straight for bicep curls."""
     #     if not hasattr(landmarks, "landmark"):
     #         return None, None  
 
@@ -29,7 +29,7 @@ class FeedbackHandler:
 
     # Bicep Curls
     def check_arm_extension(self, landmarks):
-        """✅ Check if the user's arm is fully extended for bicep curls."""
+        """Check if the user's arm is fully extended for bicep curls."""
         if not hasattr(landmarks, "landmark"):
             return None, None  
 
@@ -51,7 +51,7 @@ class FeedbackHandler:
     
     # Squats
     def check_arm_forward_when_down(self, landmarks, squat_angle, frame):
-        """✅ Check if the user's arms are straight forward when squatting down."""
+        """Check if the user's arms are straight forward when squatting down."""
         if not hasattr(landmarks, "landmark"):
             return None, None
         
@@ -69,11 +69,11 @@ class FeedbackHandler:
         arm_forward_angle = calculate_angle(left_shoulder, left_elbow, left_wrist)
         print(f"[INFO] Arm Straight Angle Detected: {arm_forward_angle:.2f}°", end=" - ")
 
-        # ✅ Calculate elbow coordinates for visualization
+        # Calculate elbow coordinates for visualization
         frame_height, frame_width, _ = frame.shape
         elbow_coords = tuple(np.multiply(left_elbow, [frame_width, frame_height]).astype(int))
 
-        # ✅ Draw angle value on the screen near the elbow
+        # Draw angle value on the screen near the elbow
         cv2.putText(frame, f"{int(arm_forward_angle)}°", elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         if arm_forward_angle <= 100:
@@ -84,7 +84,7 @@ class FeedbackHandler:
             return "Arms straight forward!", (0, 0, 255)
 
     def get_feedback_rules(self):
-        """✅ Defines feedback rules for different exercises."""
+        """Defines feedback rules for different exercises."""
         return {
             "bicep_curls": [
                 # self.check_back_straight,

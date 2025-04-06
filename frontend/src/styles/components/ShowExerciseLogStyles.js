@@ -11,18 +11,18 @@ export const Container = styled.div`
 
 export const LogGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* ✅ Always 2 cards per row */
+  grid-template-columns: repeat(2, 1fr); /* Always 2 cards per row */
   gap: 15px;
   width: 100%;
   margin-top: 20px;
 
   @media (max-width: 600px) {
-    grid-template-columns: repeat(1, 1fr); /* ✅ Switch to 1 column on small screens */
+    grid-template-columns: repeat(1, 1fr); /* Switch to 1 column on small screens */
   }
 `;
 
 export const LogCard = styled.div`
-  background: rgba(255, 255, 255, 0.15); /* ✅ Glassmorphism effect */
+  background: rgba(255, 255, 255, 0.15); /* Glassmorphism effect */
   backdrop-filter: blur(10px);
   padding: 20px;
   border-radius: 15px;

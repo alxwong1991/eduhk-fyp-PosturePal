@@ -77,7 +77,7 @@ class Squats:
 
         image, landmarks = self.detect(frame)
 
-        angle = 0  # ✅ Ensure `angle` is always initialized
+        angle = 0  # Ensure `angle` is always initialized
 
         if landmarks:
             # Get coordinates for squat angle calculation
@@ -94,7 +94,7 @@ class Squats:
             if isinstance(update_result, int):
                 self.counter = update_result
             else:
-                print(f"❌ ERROR: update() returned {update_result}, expected an integer")
+                print(f"ERROR: update() returned {update_result}, expected an integer")
                 return frame, angle, self.counter, False
 
             self.counter = self.update(angle, landmarks, frame)

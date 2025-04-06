@@ -3,7 +3,7 @@ import cv2
 from modules.camera import Camera
 
 camera = Camera()
-streaming_active = False  # ✅ Streaming state
+streaming_active = False  # Streaming state
 
 async def generate_frames_service():
     """Asynchronous video frame generator."""
@@ -11,7 +11,7 @@ async def generate_frames_service():
     camera.start_capture()
 
     while streaming_active:
-        await asyncio.sleep(0.01)  # ✅ Allow async event loop to run
+        await asyncio.sleep(0.01)  # Allow async event loop to run
         ret, frame = camera.read_frame()
         if not ret:
             break

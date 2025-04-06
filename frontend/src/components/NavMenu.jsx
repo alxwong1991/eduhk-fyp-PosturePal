@@ -16,17 +16,17 @@ import {
 const NavMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore(); // ✅ Get user & logout function from useAuth
-  const [wasLoggedIn, setWasLoggedIn] = useState(false); // ✅ Track if user was logged in
+  const { user, logout } = useAuthStore(); // Get user & logout function from useAuth
+  const [wasLoggedIn, setWasLoggedIn] = useState(false); // Track if user was logged in
 
-  // ✅ Track previous login state
+  // Track previous login state
   useEffect(() => {
     if (user) {
-      setWasLoggedIn(true); // ✅ Set true when user logs in
+      setWasLoggedIn(true); // Set true when user logs in
     }
   }, [user]);
 
-  // ✅ Show "Session Expired" alert only if the user was previously logged in
+  // Show "Session Expired" alert only if the user was previously logged in
   useEffect(() => {
     if (wasLoggedIn && user === null) {
       Swal.fire({
@@ -37,16 +37,16 @@ const NavMenu = () => {
         allowOutsideClick: false,
         allowEscapeKey: false,
       }).then(() => {
-        navigate("/login"); // ✅ Redirect to login
+        navigate("/login"); // Redirect to login
       });
 
-      setWasLoggedIn(false); // ✅ Reset state to prevent repeated alerts
+      setWasLoggedIn(false); // Reset state to prevent repeated alerts
     }
   }, [user, wasLoggedIn, navigate]);
 
   const handleLogout = () => {
-    logout(); // ✅ Calls logout function from useAuth
-    setWasLoggedIn(false); // ✅ Reset to prevent session expired alert
+    logout(); // Calls logout function from useAuth
+    setWasLoggedIn(false); // Reset to prevent session expired alert
 
     Swal.fire({
       title: "Logged Out",

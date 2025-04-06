@@ -9,9 +9,9 @@ import {
   WebcamFrame,
 } from "../styles/components/ExerciseLayoutStyles";
 
-// ✅ Webcam component that hides when exercise is not active
+// Webcam component that hides when exercise is not active
 const WebcamFeed = ({ image, isActive }) => {
-  if (!isActive) return null; // ✅ Hide webcam feed if not active
+  if (!isActive) return null; // Hide webcam feed if not active
 
   return (
     <WebcamFrame isActive={isActive}>
@@ -28,7 +28,7 @@ const WebcamFeed = ({ image, isActive }) => {
   );
 };
 
-// ✅ Reusable layout component with WebcamFeed
+// Reusable layout component with WebcamFeed
 const ExerciseLayout = ({ title, children, image, isActive }) => {
   return (
     <ExerciseContainer>
@@ -38,7 +38,7 @@ const ExerciseLayout = ({ title, children, image, isActive }) => {
       </ExerciseLeftSide>
 
       <ExerciseRightSide>
-        <WebcamFeed image={image} isActive={isActive} /> {/* ✅ Updated */}
+        <WebcamFeed image={image} isActive={isActive} /> {/* Updated */}
       </ExerciseRightSide>
     </ExerciseContainer>
   );

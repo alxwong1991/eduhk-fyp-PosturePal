@@ -29,10 +29,10 @@ export default function Register() {
     confirmPassword: "",
   });
 
-  // ✅ Utility function to get today's date in YYYY-MM-DD format
+  // Utility function to get today's date in YYYY-MM-DD format
   const getTodayDate = () => new Date().toISOString().split("T")[0];
 
-  // ✅ Function to Calculate Age from DOB
+  // Function to Calculate Age from DOB
   const calculateAge = (dob) => {
     const birthDate = new Date(dob);
     const today = new Date();
@@ -45,19 +45,19 @@ export default function Register() {
     return age;
   };
 
-  // ✅ Handle Input Change (Generalized)
+  // Handle Input Change (Generalized)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Handle DOB Change and Auto-Calculate Age
+  // Handle DOB Change and Auto-Calculate Age
   const handleDobChange = (e) => {
     const dob = e.target.value;
     setFormData((prev) => ({ ...prev, dob, age: calculateAge(dob) }));
   };
 
-  // ✅ Validate Height & Weight
+  // Validate Height & Weight
   const validateHeightWeight = () => {
     if (formData.height_cm <= 0 || isNaN(Number(formData.height_cm))) {
       return "Height must be a positive number greater than 0.";
@@ -68,7 +68,7 @@ export default function Register() {
     return null;
   };
 
-  // ✅ Handle Form Submission
+  // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -114,9 +114,9 @@ export default function Register() {
             <option value="Male">Male</option>
             <option value="Female">Female</option>
           </Select>
-          {/* ✅ Date Picker for DOB */}
+          {/* Date Picker for DOB */}
           <Input type="date" name="dob" onChange={handleDobChange} value={formData.dob} max={getTodayDate()} required />
-          {/* ✅ Show calculated age dynamically */}
+          {/* Show calculated age dynamically */}
           {formData.age && <p>Age: {formData.age} years old</p>}
           <Input type="number" name="height_cm" placeholder="Height (cm)" value={formData.height_cm} onChange={handleInputChange} required />
           <Input type="number" name="weight_kg" placeholder="Weight (kg)" value={formData.weight_kg} onChange={handleInputChange} required />

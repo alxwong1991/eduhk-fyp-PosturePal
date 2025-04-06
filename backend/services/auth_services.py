@@ -14,9 +14,9 @@ async def get_user(session: AsyncSession, user_id: int) -> User | None:
     """Fetch user details from the database."""
     try:
         result = await session.execute(select(User).where(User.id == user_id))
-        return result.scalar_one_or_none()  # ✅ Return `User` or `None`
+        return result.scalar_one_or_none()  # Return `User` or `None`
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")  # ✅ Raise exception for DB errors
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")  # Raise exception for DB errors
 
 async def register_user_service(user_data, session: AsyncSession):
     """Register a new user with hashed password."""
@@ -62,17 +62,17 @@ async def get_current_user_service(token: str = Depends(oauth2_scheme), session:
     try:
         payload = verify_access_token(token)
     except ValueError as e:
-        raise HTTPException(status_code=401, detail=str(e))  # ✅ Raise an exception instead of returning a tuple
+        raise HTTPException(status_code=401, detail=str(e))  # Raise an exception instead of returning a tuple
 
     user_id = payload.get("user_id")
     if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token payload")  # ✅ Return error properly
+        raise HTTPException(status_code=401, detail="Invalid token payload")  # Return error properly
 
     user = await get_user(session, user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")  # ✅ Raise an exception if the user is missing
+        raise HTTPException(status_code=404, detail="User not found")  # Raise an exception if the user is missing
 
-    return user  # ✅ Return a single `User` object
+    return user  # Return a single `User` object
 
 async def logout_user_service(user):
     """Logs out the user by clearing session/token (if applicable)."""

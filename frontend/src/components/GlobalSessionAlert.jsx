@@ -11,7 +11,7 @@ function GlobalSessionAlert() {
   useEffect(() => {
     let interval;
 
-    if (token) { // ✅ Only run interval if the user is logged in
+    if (token) { // Only run interval if the user is logged in
       interval = setInterval(() => {
         if (!loading && useAuthStore.getState().isTokenExpired()) {
           handleSessionExpiration();
@@ -20,9 +20,9 @@ function GlobalSessionAlert() {
     }
 
     return () => {
-      if (interval) clearInterval(interval); // ✅ Stop interval on unmount or logout
+      if (interval) clearInterval(interval); // Stop interval on unmount or logout
     };
-  }, [loading, handleSessionExpiration, token]); // ✅ Depend on `token`
+  }, [loading, handleSessionExpiration, token]); // Depend on `token`
 
   useEffect(() => {
     if (!loading && sessionExpired && !alertShown) {
@@ -36,7 +36,7 @@ function GlobalSessionAlert() {
         allowOutsideClick: false,
         allowEscapeKey: false,
       }).then(() => {
-        logout(); // ✅ Ensure the user is fully logged out
+        logout(); // Ensure the user is fully logged out
         setAlertShown(false);
         navigate("/login");
       });

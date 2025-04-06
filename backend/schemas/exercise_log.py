@@ -19,4 +19,4 @@ class ExerciseResponse(BaseModel):
     exercise_date: datetime
 
     class Config:
-        from_attributes = True  # ✅ Ensures SQLModel objects are converted properly
+        from_attributes = True

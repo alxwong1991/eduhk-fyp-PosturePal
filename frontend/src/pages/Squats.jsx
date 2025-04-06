@@ -19,7 +19,7 @@ export default function Squats() {
 
     resetWebSocketState();
     setIsExerciseRunning(true);
-    useWebsocketStore.setState({ exerciseFinished: false }); // ✅ Reset WebSocket state
+    useWebsocketStore.setState({ exerciseFinished: false }); // Reset WebSocket state
     await showCountdown();
     const startTime = Date.now();
 

@@ -21,7 +21,7 @@ const useWebsocketStore = create((set, get) => ({
 
     const cameraReady = await apiCheckCamera();
     if (!cameraReady) {
-      console.error("❌ Camera is not ready, aborting exercise.");
+      console.error("Camera is not ready, aborting exercise.");
       return;
     }
 
@@ -47,7 +47,7 @@ const useWebsocketStore = create((set, get) => ({
       set({ webSocket: ws });
 
       ws.onerror = (error) => {
-        console.error("❌ WebSocket error:", error);
+        console.error("WebSocket error:", error);
         get().cleanupWebSocket();
         if (onComplete) onComplete({});
       };
@@ -57,7 +57,7 @@ const useWebsocketStore = create((set, get) => ({
         get().cleanupWebSocket();
       };
     } catch (error) {
-      console.error("❌ Error starting WebSocket exercise:", error);
+      console.error("Error starting WebSocket exercise:", error);
       get().cleanupWebSocket();
       if (onComplete) onComplete({});
     }

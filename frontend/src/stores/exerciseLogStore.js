@@ -7,7 +7,7 @@ const useExerciseLogStore = create((set) => ({
   error: null,
   exerciseLogs: [],
 
-  // ✅ Fetch logs and update store
+  // Fetch logs and update store
   loadLogs: async (userId) => {
     try {
       const logs = await fetchExerciseLogs(userId);
@@ -17,13 +17,13 @@ const useExerciseLogStore = create((set) => ({
     }
   },
 
-  // ✅ Save a new log
+  // Save a new log
   saveLog: async (userId, exerciseName, totalReps, totalCalories, durationMinutes) => {
     set({ saving: true, error: null });
 
     try {
       const response = await saveExerciseLog(userId, exerciseName, totalReps, totalCalories, durationMinutes);
-      set((state) => ({ exerciseLogs: [response, ...state.exerciseLogs] })); // ✅ Add new log to state
+      set((state) => ({ exerciseLogs: [response, ...state.exerciseLogs] })); // Add new log to state
     } catch (err) {
       set({ error: err.message });
     } finally {
@@ -31,13 +31,13 @@ const useExerciseLogStore = create((set) => ({
     }
   },
 
-  // ✅ Delete an existing log
+  // Delete an existing log
   deleteLog: async (logId) => {
     set({ deleting: true, error: null });
 
     try {
       await deleteExerciseLog(logId);
-      set((state) => ({ exerciseLogs: state.exerciseLogs.filter((log) => log.id !== logId) })); // ✅ Remove from state
+      set((state) => ({ exerciseLogs: state.exerciseLogs.filter((log) => log.id !== logId) })); // Remove from state
     } catch (err) {
       set({ error: err.message });
     } finally {

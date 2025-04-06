@@ -30,14 +30,14 @@ async def send_countdown(websocket):
         await websocket.send_json({"event": "display_countdown", "countdown": i})
         await asyncio.sleep(1)
 
-import json  # ✅ Import JSON module for pretty printing
+import json
 
 async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, user, total_calories_burned, start_time):
     """Process a frame, track reps, and update calories based on completed reps."""
     try:
         frame, angle, new_counter, time_up = exercise_helper.perform_exercise(exercise, frame, max_reps)
     except Exception as e:
-        print(f"❌ Error in perform_exercise: {e}")
+        print(f"Error in perform_exercise: {e}")
         await websocket.send_json({"error": "Failed to process exercise data"})
         return None, None, None, True
 
@@ -45,10 +45,10 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
     duration_seconds = round(elapsed_time, 2)
     duration_minutes = round(duration_seconds / 60, 2)
 
-    # ✅ Validate user profile data
+    # Validate user profile data
     if not user:
         await websocket.send_json({"error": "User not found."})
-        print("❌ ERROR: User not found.")
+        print("ERROR: User not found.")
         return None, None, None, True
 
     required_fields = ["weight_kg", "height_cm", "gender", "dob"]
@@ -58,15 +58,15 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
         await websocket.send_json({
             "error": f"User profile incomplete. Missing: {', '.join(missing_fields)}."
         })
-        print(f"❌ ERROR: Missing user profile data: {missing_fields}")
+        print(f"ERROR: Missing user profile data: {missing_fields}")
         return None, None, None, True
 
-    print(f"🔍 Using Weight: {user.weight_kg} kg for calorie calculation")
+    print(f"Using Weight: {user.weight_kg} kg for calorie calculation")
 
     age = user.calculate_age()
-    print(f"🔍 Using Weight: {user.weight_kg} kg and Age: {age} years")
+    print(f"Using Weight: {user.weight_kg} kg and Age: {age} years")
 
-    # ✅ Estimate calories for a single rep (~3 seconds)
+    # Estimate calories for a single rep (~3 seconds)
     calories_per_rep = estimate_calories_burned(
         weight_kg=user.weight_kg,
         height_cm=user.height_cm,
@@ -81,7 +81,7 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
 
     exercise_helper.previous_counter = new_counter
 
-    # 📸 Encode frame for transmission
+    # Encode frame for transmission
     _, buffer = cv2.imencode(".jpg", frame)
     base64_frame = base64.b64encode(buffer).decode("utf-8")
 
@@ -96,7 +96,7 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
     # 🧾 Log data without image
     response_data_debug = response_data.copy()
     response_data_debug.pop("image", None)
-    print("📊 **Formatted Response Data (Without Image):**")
+    print("**Formatted Response Data (Without Image):**")
     print(json.dumps(response_data_debug, indent=4))
 
     await websocket.send_json(response_data)
@@ -131,19 +131,19 @@ async def start_exercise_session(websocket, session, camera, exercise_helper, ex
             elapsed_time = asyncio.get_event_loop().time() - start_time
             duration_minutes = round(elapsed_time / 60, 2)
 
-            # ✅ Ensure the correct data is sent
+            # Ensure the correct data is sent
             response_data = {
                 "event": "exercise_complete",
                 "message": "Workout complete!",
                 "totalReps": counter,
-                "totalCaloriesBurned": round(total_calories_burned, 2),  # ✅ Ensure correct calories
+                "totalCaloriesBurned": round(total_calories_burned, 2),  # Ensure correct calories
                 "durationMinutes": duration_minutes,
                 "userId": user.id if user else None
             }
 
-            # ✅ Debugging log
-            print("📊 **Final Response Data Sent to Frontend:**")
-            print(json.dumps(response_data, indent=4))  # ✅ Ensure correct values are sent
+            # Debugging log
+            print("**Final Response Data Sent to Frontend:**")
+            print(json.dumps(response_data, indent=4))  # Ensure correct values are sent
 
             await websocket.send_json(response_data)
             break
@@ -173,29 +173,29 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
 
         if user_id is not None:
             try:
-                user_id = int(user_id)  # ✅ Convert to integer
+                user_id = int(user_id)  # Convert to integer
             except ValueError:
                 await websocket.send_json({"error": "Invalid user_id format. Must be an integer."})
                 return
 
-        user = await get_user(session, user_id)  # ✅ Now `get_user()` returns only `User` or `None`
+        user = await get_user(session, user_id)  # Now `get_user()` returns only `User` or `None`
 
-        if user is None:  # ✅ Handle the case where the user is not found
-            print("❌ Error fetching user: User not found")
+        if user is None:  # Handle the case where the user is not found
+            print("Error fetching user: User not found")
             await websocket.send_json({"error": "User not found"})
             return
 
-        print(f"✅ User found: {user.name}, ID: {user.id}")
+        print(f"User found: {user.name}, ID: {user.id}")
 
         if user:
-            print(f"✅ User found: {user.name}, ID: {user.id}")
+            print(f"User found: {user.name}, ID: {user.id}")
         else:
-            print("⚠️ No user found, proceeding as guest.")
+            print("No user found, proceeding as guest.")
 
         await start_exercise_session(websocket, session, camera, exercise_helper, exercise, difficulty, user)
 
     except Exception as e:
-        print(f"❌ WebSocket Error: {e}")
+        print(f"WebSocket Error: {e}")
     finally:
         camera.release_capture()
         await websocket.close()

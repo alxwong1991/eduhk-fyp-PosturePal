@@ -12,10 +12,10 @@ exercise_log_router = APIRouter()
 async def log_exercise(
     exercise_data: ExerciseCreate, 
     session: AsyncSession = Depends(get_session), 
-    user: User = Depends(get_current_user_service)  # ✅ Now directly returns `User`
+    user: User = Depends(get_current_user_service)  # Now directly returns `User`
 ):
     """API Endpoint to log an exercise."""
-    return await log_exercise_service(exercise_data, session, user)  # ✅ Use `user` directly
+    return await log_exercise_service(exercise_data, session, user)  # Use `user` directly
 
 @exercise_log_router.get("/logs/{user_id}", response_model=list[ExerciseResponse])
 async def get_user_exercises(user_id: int, session: AsyncSession = Depends(get_session)):

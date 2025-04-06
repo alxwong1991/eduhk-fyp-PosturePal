@@ -5,40 +5,40 @@ from alembic import context
 import os
 from dotenv import load_dotenv
 
-# ✅ Load environment variables
+# Load environment variables
 load_dotenv()
 
-# ✅ Get DATABASE_URL from .env
+# Get DATABASE_URL from .env
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-# ✅ Convert asyncpg to psycopg2 (Alembic requires a sync driver)
+# Convert asyncpg to psycopg2 (Alembic requires a sync driver)
 if DATABASE_URL.startswith("postgresql+asyncpg"):
     DATABASE_URL = DATABASE_URL.replace("postgresql+asyncpg", "postgresql+psycopg2")
 
-# ✅ Check if DATABASE_URL is set
+# Check if DATABASE_URL is set
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in the environment variables!")
 
-# ✅ Alembic Config object
+# Alembic Config object
 config = context.config
 
-# ✅ Set the database URL in Alembic config (AFTER replacing asyncpg)
+# Set the database URL in Alembic config (AFTER replacing asyncpg)
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
-# ✅ Setup logging
+# Setup logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# ✅ Import all models dynamically (instead of manually importing each one)
+# Import all models dynamically (instead of manually importing each one)
 from models import user, exercise_log  # Add all model files here
 
-# ✅ Set metadata for autogeneration
+# Set metadata for autogeneration
 target_metadata = SQLModel.metadata
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     context.configure(
-        url=DATABASE_URL,  # ✅ Use DATABASE_URL directly
+        url=DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -49,7 +49,7 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    engine = create_engine(DATABASE_URL, poolclass=pool.NullPool)  # ✅ Use create_engine()
+    engine = create_engine(DATABASE_URL, poolclass=pool.NullPool)
 
     with engine.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
