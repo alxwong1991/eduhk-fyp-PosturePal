@@ -23,7 +23,7 @@ export async function saveExerciseLog(userId, exerciseName, totalReps, totalCalo
       duration_minutes: durationMinutes,
     };
 
-    console.log("📤 Sending Exercise Log Data:", requestData);
+    console.log("Sending Exercise Log Data:", requestData);
 
     const response = await axios.post(`${API_BASE_URL}/exercise/log`, requestData, {
       headers: { Authorization: `Bearer ${token}` },
@@ -44,7 +44,7 @@ export async function fetchExerciseLogs(userId) {
       throw new Error("User is not authenticated.");
     }
 
-    console.log(`📥 Fetching Exercise Logs for User ID: ${userId}`);
+    console.log(`Fetching Exercise Logs for User ID: ${userId}`);
 
     const response = await axios.get(`${API_BASE_URL}/exercise/logs/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -65,7 +65,7 @@ export async function deleteExerciseLog(logId) {
       throw new Error("User is not authenticated.");
     }
 
-    console.log(`🗑️ Deleting Exercise Log with ID: ${logId}`);
+    console.log(`Deleting Exercise Log with ID: ${logId}`);
 
     await axios.delete(`${API_BASE_URL}/exercise/log/${logId}`, {
       headers: { Authorization: `Bearer ${token}` },

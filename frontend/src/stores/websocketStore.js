@@ -19,6 +19,7 @@ const useWebsocketStore = create((set, get) => ({
   startWebSocketExercise: async (exerciseType, difficulty, onComplete) => {
     set({ resultData: null, image: null, counter: 0, calories: null, exerciseFinished: false });
 
+    // Check if camera is ready
     const cameraReady = await apiCheckCamera();
     if (!cameraReady) {
       console.error("Camera is not ready, aborting exercise.");
@@ -29,6 +30,7 @@ const useWebsocketStore = create((set, get) => ({
       const ws = createExerciseWebSocket(
         exerciseType,
         difficulty,
+        // Callback for receiving new image and exercise data
         (newImage, newCounter, newCalories) => {
           set({
             image: newImage ? `data:image/jpeg;base64,${newImage}` : null,
@@ -36,14 +38,16 @@ const useWebsocketStore = create((set, get) => ({
             calories: newCalories ?? null,
           });
         },
+        // Callback for receiving final result
         (data) => {
-          console.log("🟢 **Frontend Received Final Data:**", data);
+          console.log("**Frontend Received Final Data:**", data);
           set({ resultData: data || {}, exerciseFinished: true });
 
           if (onComplete) onComplete(data || {});
         }
       );
 
+      // Save WebSocket instance in state
       set({ webSocket: ws });
 
       ws.onerror = (error) => {
@@ -53,7 +57,7 @@ const useWebsocketStore = create((set, get) => ({
       };
 
       ws.onclose = () => {
-        console.log("🔴 WebSocket closed.");
+        console.log("WebSocket closed.");
         get().cleanupWebSocket();
       };
     } catch (error) {
@@ -63,6 +67,7 @@ const useWebsocketStore = create((set, get) => ({
     }
   },
 
+  // Resets the state related to WebSocket exercise session.
   resetWebSocketState: () => set({ image: null, counter: 0, calories: null, exerciseFinished: false }),
 
   cleanupWebSocket: () => {

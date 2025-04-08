@@ -88,7 +88,7 @@ class BicepCurls:
             if arm_message:
                 self.feedback_message = arm_message  # Store latest feedback message
 
-            print(f"[INFO] Curl Angle Detected: {angle:.2f}°", end=" - ")
+            # print(f"[INFO] Curl Angle Detected: {angle:.2f}°", end=" - ")
 
             if angle > 160:
                 self.stage = "down"
@@ -114,7 +114,6 @@ class BicepCurls:
 
         image, landmarks = self.detect(frame)
 
-        # # Ensure angle is always initialized
         angle = 0  
 
         if landmarks:
@@ -129,7 +128,7 @@ class BicepCurls:
 
             update_result = self.update(angle, landmarks)
             if isinstance(update_result, tuple) and len(update_result) == 2:
-                self.counter, arm_color = update_result  # Corrected unpacking
+                self.counter, arm_color = update_result
             else:
                 print(f"ERROR: update() returned {update_result}, expected (counter, arm_color)")
                 return frame, angle, self.counter, False  # Prevent crash
@@ -158,4 +157,4 @@ class BicepCurls:
             elbow_coords = (max(elbow_coords[0] - 20, 0), max(elbow_coords[1] - 10, 0))  # Adjust for better visibility
             cv2.putText(image, f"{int(angle)}°", elbow_coords, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)
 
-        return image, angle, self.counter, False  # Time is not up yet
+        return image, angle, self.counter, False

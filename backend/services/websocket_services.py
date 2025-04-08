@@ -93,7 +93,7 @@ async def process_frame(websocket, exercise_helper, exercise, frame, max_reps, u
         "totalCaloriesBurned": round(total_calories_burned, 2)
     }
 
-    # 🧾 Log data without image
+    # Log data without image
     response_data_debug = response_data.copy()
     response_data_debug.pop("image", None)
     print("**Formatted Response Data (Without Image):**")
@@ -165,7 +165,7 @@ async def handle_exercise_websocket(websocket: WebSocket, session: Session):
         except Exception:
             query_params = {}
 
-        print(f"🔹 WebSocket Query Params: {query_params}")
+        print(f"WebSocket Query Params: {query_params}")
 
         exercise = query_params.get("exercise")
         difficulty = query_params.get("difficulty", DEFAULT_DIFFICULTY)

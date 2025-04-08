@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-// 🏋️‍♂️ Full-page container for the results page
+// Full-page container for the results page
 export const ResultPageContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -12,7 +12,6 @@ export const ResultPageContainer = styled.div`
   color: white;
 `;
 
-// 📜 Glassmorphism effect for result display
 export const ResultCard = styled.div`
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);

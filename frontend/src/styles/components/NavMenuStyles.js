@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const NavContainer = styled.nav`
   width: 100%;
-  position: fixed; /* Make navbar fixed at the top */
+  position: fixed;
   top: 0;
   left: 0;
   background: rgba(255, 255, 255, 0.1);
@@ -60,5 +60,5 @@ export const UserName = styled.span`
 `;
 
 export const Spacer = styled.div`
-  height: 80px; /* Add space below navbar */
+  height: 80px;
 `;

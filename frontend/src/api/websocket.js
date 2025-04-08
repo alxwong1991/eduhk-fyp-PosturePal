@@ -32,7 +32,7 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
       userId ? `&user_id=${userId}` : ""
     }`;
 
-    console.log("🔹 WebSocket Initializing:", wsUrl);
+    console.log("WebSocket Initializing:", wsUrl);
 
     const ws = new WebSocket(wsUrl);
 
@@ -59,7 +59,7 @@ export function createExerciseWebSocket(exerciseType, difficulty, onMessage, onC
             durationMinutes: data.durationMinutes ?? 0,
           };
 
-          console.log("🟢 Exercise Complete:", resultData);
+          console.log("Exercise Complete:", resultData);
           onComplete?.(resultData); // Ensure callback is called safely
         }
       } catch (error) {

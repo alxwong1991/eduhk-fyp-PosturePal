@@ -2,7 +2,7 @@ from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 from pydantic import EmailStr
 from datetime import date, datetime
-from utils.security import verify_password  # Import from security.py
+from utils.security import verify_password
 
 class User(SQLModel, table=True):
     """User model with relationship to ExerciseLog."""
@@ -27,5 +27,5 @@ class User(SQLModel, table=True):
         return age
 
     def check_password(self, password: str) -> bool:
-        """Verify hashed password (renamed to avoid confusion)."""
+        """Verify hashed password."""
         return verify_password(password, self.password_hash)
