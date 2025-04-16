@@ -59,7 +59,6 @@ Before getting started, ensure you have the following installed:
 - Python 3.8+
 - Node.js 14.x+
 - npm 6.x+
-- A webcam
 - Git
 - Docker *(for database setup)*
 - A Webcam *(For AI Tracking)*
